@@ -33,7 +33,7 @@ const Brickwall: React.FC<BrickwallProps> = ({
   onChildrenReposition,
   wrapperClassname,
 }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
+  const context = React.useRef<HTMLDivElement>(null);
   const draggedElement = React.useRef<DropItem>();
   const sleep = React.useRef(false);
   const finalReposition = React.useRef<FinalReposition>({});
@@ -41,7 +41,7 @@ const Brickwall: React.FC<BrickwallProps> = ({
   const dropZones = React.useRef<DropZone[]>([]);
 
   const repositionChildren = React.useCallback((animated = true) => {
-    if (!ref.current) return;
+    if (!context.current) return;
     sleep.current = true;
     setTimeout(() => (sleep.current = false), 150);
 
@@ -66,7 +66,7 @@ const Brickwall: React.FC<BrickwallProps> = ({
         xOffset += child.getFullWidth() + gridGap;
 
         child.self.onmousedown = (e) => {
-          if (draggedElement.current || !ref.current) return;
+          if (draggedElement.current || !context.current) return;
           child.applyMouseDownStyle(e);
           draggedElement.current = child;
           finalReposition.current.from = { dropZone, index: i };
@@ -86,11 +86,11 @@ const Brickwall: React.FC<BrickwallProps> = ({
   );
 
   React.useEffect(() => {
-    if (!ref.current) return;
+    if (!context.current) return;
 
     // TODO - extract to utils
     const res: DropZone[] = [];
-    makeArayOfElements(ref.current.children).forEach((child) => {
+    makeArayOfElements(context.current.children).forEach((child) => {
       if (child.id) res.push(new DropZone(child));
       else
         makeArayOfElements(child.children).forEach((subChild) => {
@@ -103,8 +103,8 @@ const Brickwall: React.FC<BrickwallProps> = ({
     });
     dropZones.current = res;
 
-    if (!ref.current.onmousemove) {
-      ref.current.onmousemove = (e) => {
+    if (!context.current.onmousemove) {
+      context.current.onmousemove = (e) => {
         for (let i = 0; i < dropZones.current.length; i++) {
           const dropZone = dropZones.current[i];
           if (!draggedElement.current || sleep.current) break;
@@ -247,7 +247,7 @@ const Brickwall: React.FC<BrickwallProps> = ({
     <div
       style={{ display: "flex", position: "relative" }}
       className={wrapperClassname}
-      ref={ref}
+      ref={context}
     >
       {children}
     </div>
