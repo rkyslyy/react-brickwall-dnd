@@ -1,11 +1,12 @@
 {
   "name": "react-brickwall",
-  "version": "1.0.0",
+  "version": "1.0.10",
   "description": "Fancy drag-n-drop component.",
-  "main": "./lib/index.js",
+  "typings": "./lib/GridDnd.d.ts",
+  "module": "./lib/GridDnd.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
+    "build": "rm -rf lib; tsc",
     "lint": "tslint -c tslint.json src/**/*.ts",
     "prepublish": "npm run build"
   },
@@ -24,7 +25,6 @@
   "files": [
     "lib"
   ],
-  "typings": "./lib/index.d.ts",
   "devDependencies": {
     "@babel/preset-typescript": "^7.12.7",
     "@types/node": "^14.14.21",

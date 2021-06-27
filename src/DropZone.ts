@@ -1,7 +1,8 @@
 import { DropItem } from "./DropItem";
 
-const makeArayOfElements = (collection: HTMLCollection) =>
-  ([...collection] as unknown) as HTMLElement[];
+const makeArayOfElements = (collection: HTMLCollection) => [
+  ...(collection as unknown as HTMLElement[]),
+];
 
 export class DropZone {
   container: HTMLElement;

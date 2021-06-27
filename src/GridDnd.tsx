@@ -23,8 +23,9 @@ export interface FinalReposition {
   to?: Location;
 }
 
-const makeArayOfElements = (collection: HTMLCollection) =>
-  [...collection] as unknown as HTMLElement[];
+const makeArayOfElements = (collection: HTMLCollection) => [
+  ...(collection as unknown as HTMLElement[]),
+];
 
 const GridDnd: React.FC<GridDndProps> = ({
   children,
