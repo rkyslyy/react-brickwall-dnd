@@ -32,3 +32,5 @@ export class DropZone {
   switchItemPosition = (from: number, to: number) =>
     this.insertItemAt(to, this.removeItemAt(from)[0]);
 }
+
+export default DropZone;

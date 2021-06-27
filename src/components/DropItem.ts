@@ -94,3 +94,5 @@ export class DropItem {
 
   updateDropZone = (newDropZone: DropZone) => (this.dropZone = newDropZone);
 }
+
+export default DropItem;

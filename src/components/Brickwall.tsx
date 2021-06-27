@@ -1,3 +1,5 @@
+import "../setup/extendHtmlCollection";
+
 import React from "react";
 import { DropItem } from "./DropItem";
 import { DropZone } from "./DropZone";
@@ -22,10 +24,6 @@ export interface FinalReposition {
   from?: Location;
   to?: Location;
 }
-
-const makeArayOfElements = (collection: HTMLCollection) => [
-  ...(collection as unknown as HTMLElement[]),
-];
 
 const Brickwall: React.FC<BrickwallProps> = ({
   children,
@@ -91,13 +89,13 @@ const Brickwall: React.FC<BrickwallProps> = ({
 
     // TODO - extract to utils
     const res: DropZone[] = [];
-    makeArayOfElements(context.current.children).forEach((child) => {
+    context.current.children.array().forEach((child) => {
       if (child.id) res.push(new DropZone(child));
       else
-        makeArayOfElements(child.children).forEach((subChild) => {
+        child.children.array().forEach((subChild) => {
           if (subChild.id) res.push(new DropZone(subChild));
           else
-            makeArayOfElements(subChild.children).forEach((subSubChild) => {
+            subChild.children.array().forEach((subSubChild) => {
               if (subSubChild.id) res.push(new DropZone(subSubChild));
             });
         });
