@@ -34,11 +34,12 @@ const Brickwall: React.FC<BrickwallProps> = ({
   wrapperClassname,
 }) => {
   const context = React.useRef<HTMLDivElement>(null);
-  const draggedElement = React.useRef<DropItem>();
+  const dropZones = React.useRef<DropZone[]>([]);
+  const draggedElement = React.useRef<DropItem | null>(null);
+
   const sleep = React.useRef(false);
   const finalReposition = React.useRef<FinalReposition>({});
   const currentFrom = React.useRef<Location>();
-  const dropZones = React.useRef<DropZone[]>([]);
 
   const repositionChildren = React.useCallback((animated = true) => {
     if (!context.current) return;
@@ -218,7 +219,7 @@ const Brickwall: React.FC<BrickwallProps> = ({
       draggedElement.current.self.style.zIndex = "1";
       draggedElement.current.self.style.transition = "all .15s ease";
       draggedElement.current.self.style.cursor = "grab";
-      draggedElement.current = undefined;
+      draggedElement.current = null;
       repositionChildren();
       setTimeout(() => {
         if (
