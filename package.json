@@ -2,8 +2,8 @@
   "name": "react-brickwall",
   "version": "1.0.10",
   "description": "Fancy drag-n-drop component.",
-  "typings": "./lib/GridDnd.d.ts",
-  "module": "./lib/GridDnd.js",
+  "typings": "./lib/index.d.ts",
+  "module": "./lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf lib; tsc",
