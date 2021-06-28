@@ -1,5 +1,5 @@
 import "./setup";
 
-import Brickwall from "./components/Brickwall";
+import { Brickwall } from "./components";
 
 export default Brickwall;
