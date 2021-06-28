@@ -1,6 +1,5 @@
-import "../setup/extendHtmlCollection";
-
 import React from "react";
+
 import { DropItem, DropZone } from "../entities";
 
 import { BrickwallProps, FinalReposition, Location } from "./Brickwall.models";
