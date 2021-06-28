@@ -1,29 +1,9 @@
 import "../setup/extendHtmlCollection";
 
 import React from "react";
-import { DropItem } from "./DropItem";
-import { DropZone } from "./DropZone";
+import { DropItem, DropZone } from "../entities";
 
-interface BrickwallProps {
-  gridGap?: number;
-  wrapperClassname?: string;
-  onChildrenReposition: (
-    fromId: string,
-    fromIndex: number,
-    toId: string,
-    toIndex: number
-  ) => void;
-}
-
-export interface Location {
-  dropZone: DropZone;
-  index: number;
-}
-
-export interface FinalReposition {
-  from?: Location;
-  to?: Location;
-}
+import { BrickwallProps, FinalReposition, Location } from "./Brickwall.models";
 
 const Brickwall: React.FC<BrickwallProps> = ({
   children,
