@@ -1,6 +1,7 @@
 import React from "react";
 
 import { DropItem, DropZone } from "../entities";
+import { collectDropzones } from "../utils/collectDropzones";
 
 import { BrickwallProps, FinalReposition, Location } from "./Brickwall.models";
 
@@ -66,20 +67,7 @@ const Brickwall: React.FC<BrickwallProps> = ({
   React.useEffect(() => {
     if (!context.current) return;
 
-    // TODO - extract to utils
-    const res: DropZone[] = [];
-    context.current.children.array().forEach((child) => {
-      if (child.id) res.push(new DropZone(child));
-      else
-        child.children.array().forEach((subChild) => {
-          if (subChild.id) res.push(new DropZone(subChild));
-          else
-            subChild.children.array().forEach((subSubChild) => {
-              if (subSubChild.id) res.push(new DropZone(subSubChild));
-            });
-        });
-    });
-    dropZones.current = res;
+    dropZones.current = collectDropzones(context.current);
 
     if (!context.current.onmousemove) {
       context.current.onmousemove = (e) => {
