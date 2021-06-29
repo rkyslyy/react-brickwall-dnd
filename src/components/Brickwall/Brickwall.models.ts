@@ -1,6 +1,6 @@
 import { DropZone } from "../../entities";
 
-type OnChildRepositionCallback = (
+export type OnChildRepositionCallback = (
   fromId: string,
   fromIndex: number,
   toId: string,
