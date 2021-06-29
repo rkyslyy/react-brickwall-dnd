@@ -29,19 +29,18 @@ class DndController {
   }
 
   setup = (contextWrapper: HTMLElement) => {
-    // Make document listen to mouse events
     this.prepareDocument();
-
-    // Make wrapper interactive (listen to clicks, drags etc)
     this.prepareContextWrapper(contextWrapper);
-
-    // Set base styles, make items responsive to clicks
     this.prepareDropzonesAndItems();
 
     // Initial positioning
     this.repositionItems();
   };
 
+  /**
+   * We want to track mousemove / mouseup everywhere in the document to
+   * allow dragging items outside Brickwall context.
+   */
   prepareDocument = () => {
     document.addEventListener("mouseup", this.clearDraggedItem);
     document.addEventListener("mousemove", this.moveDraggedItem);
@@ -51,15 +50,23 @@ class DndController {
     };
   };
 
+  /**
+   * Finish dragging.
+   *
+   * 1. Animate placing dragged item in the new position.
+   * 2. Notify parent about final changes.
+   */
   clearDraggedItem = () => {
     if (!this.draggedItem) return;
+
     this.draggedItem.self.style.zIndex = "1";
     this.draggedItem.self.style.transition = "all .15s ease";
     this.draggedItem.self.style.cursor = "grab";
     this.draggedItem = null;
+
     this.repositionItems();
 
-    // setTimeout() needed to allow animation to finish
+    // setTimeout() needed to not interrupt animation after mouse button is released
     setTimeout(() => {
       if (this.finalReposition.from !== undefined && this.finalReposition.to !== undefined)
         this.onFinalItemsReposition(
@@ -70,11 +77,15 @@ class DndController {
         );
       this.finalReposition = {};
       this.currentFrom = null;
+      // TODO - no magic numbers
     }, 150);
   };
 
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
 
+  /**
+   * Setup all positioning calculations.
+   */
   prepareContextWrapper = (contextWrapper: HTMLElement) => {
     this.contextWrapper = contextWrapper;
 
@@ -179,6 +190,9 @@ class DndController {
     };
   };
 
+  /**
+   * Recursively check all context children and build DropZone and DropItem objects.
+   */
   prepareDropzonesAndItems = () => {
     // TODO - move collectDropzones from utils to this class
     this.dropZones = collectDropzones(this.contextWrapper);
