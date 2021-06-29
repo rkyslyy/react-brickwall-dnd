@@ -28,7 +28,10 @@ class DndController {
     this.onFinalItemsReposition = onFinalItemsReposition;
   }
 
-  setup(contextWrapper: HTMLElement) {
+  setup = (contextWrapper: HTMLElement) => {
+    // Make document listen to mouse events
+    this.prepareDocument();
+
     // Make wrapper interactive (listen to clicks, drags etc)
     this.prepareContextWrapper(contextWrapper);
 
@@ -37,18 +40,18 @@ class DndController {
 
     // Initial positioning
     this.repositionItems();
-  }
+  };
 
-  prepareDocument() {
+  prepareDocument = () => {
     document.addEventListener("mouseup", this.clearDraggedItem);
     document.addEventListener("mousemove", this.moveDraggedItem);
     return () => {
       document.removeEventListener("mouseup", this.clearDraggedItem);
       document.removeEventListener("mousemove", this.moveDraggedItem);
     };
-  }
+  };
 
-  clearDraggedItem() {
+  clearDraggedItem = () => {
     if (!this.draggedItem) return;
     this.draggedItem.self.style.zIndex = "1";
     this.draggedItem.self.style.transition = "all .15s ease";
@@ -68,13 +71,11 @@ class DndController {
       this.finalReposition = {};
       this.currentFrom = null;
     }, 150);
-  }
+  };
 
-  moveDraggedItem(e: MouseEvent) {
-    this.draggedItem?.move(e);
-  }
+  moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
 
-  prepareContextWrapper(contextWrapper: HTMLElement) {
+  prepareContextWrapper = (contextWrapper: HTMLElement) => {
     this.contextWrapper = contextWrapper;
 
     contextWrapper.onmousemove = (e) => {
@@ -176,31 +177,33 @@ class DndController {
         }
       }
     };
-  }
+  };
 
-  prepareDropzonesAndItems() {
+  prepareDropzonesAndItems = () => {
     // TODO - move collectDropzones from utils to this class
     this.dropZones = collectDropzones(this.contextWrapper);
 
-    this.dropZones.forEach((dropZone) => {
+    for (let i = 0; i < this.dropZones.length; i++) {
+      const dropZone = this.dropZones[i];
+
       if (!dropZone.container.style.minHeight) dropZone.container.style.minHeight = "30px";
 
-      dropZone.items.forEach((child, index) => {
-        child.self.style.position = "absolute";
+      dropZone.items.forEach((item, index) => {
+        item.self.style.position = "absolute";
 
-        child.self.onmousedown = (e) => {
+        item.self.onmousedown = (e) => {
           if (this.draggedItem) return;
 
-          child.applyMouseDownStyle(e);
-          this.draggedItem = child;
+          item.applyMouseDownStyle(e);
+          this.draggedItem = item;
           this.finalReposition.from = { dropZone, index };
           this.currentFrom = { dropZone, index };
         };
       });
-    });
-  }
+    }
+  };
 
-  repositionItems(animated: boolean = true) {
+  repositionItems = (animated: boolean = true) => {
     this.dropZones.forEach((dropZone) => {
       const maxWidth = dropZone.container.clientWidth;
 
@@ -232,7 +235,7 @@ class DndController {
       // Actually extend container height
       dropZone.container.style.height = `${resultingContainerHeight}px`;
     });
-  }
+  };
 }
 
 export default DndController;
