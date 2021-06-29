@@ -85,9 +85,12 @@ class DndController {
 
   /**
    * Setup all positioning calculations.
+   * TODO - refactor this horrible mess
    */
   prepareContextWrapper = (contextWrapper: HTMLElement) => {
     this.contextWrapper = contextWrapper;
+    contextWrapper.style.display = "flex";
+    contextWrapper.style.position = "relative";
 
     contextWrapper.onmousemove = (e) => {
       for (let i = 0; i < this.dropZones.length; i++) {

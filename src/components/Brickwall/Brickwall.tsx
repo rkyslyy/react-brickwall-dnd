@@ -15,28 +15,10 @@ const Brickwall: React.FC<BrickwallProps> = ({
   );
 
   return (
-    <div
-      style={{ display: "flex", position: "relative" }}
-      className={wrapperClassname}
-      ref={(r) => !!r && dndController.current.setup(r)}
-    >
+    <div className={wrapperClassname} ref={(r) => !!r && dndController.current.setup(r)}>
       {children}
     </div>
   );
 };
 
 export default Brickwall;
-
-// const dndController = React.useRef(
-//   new DndController({ gridGap, onFinalItemsReposition: onChildrenReposition })
-// );
-
-// return (
-//   <div
-//     style={{ display: "flex", position: "relative" }}
-//     className={wrapperClassname}
-//     ref={(r) => !!r && dndController.current.setup(r)}
-//   >
-//     {children}
-//   </div>
-// );
