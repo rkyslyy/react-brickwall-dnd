@@ -1,4 +1,4 @@
-import { DropZone } from "../entities";
+import { DropZone } from "../../entities";
 
 type OnChildRepositionCallback = (
   fromId: string,

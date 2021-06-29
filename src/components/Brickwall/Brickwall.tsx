@@ -1,7 +1,7 @@
 import React from "react";
 
-import { DropItem, DropZone } from "../entities";
-import { collectDropzones } from "../utils/collectDropzones";
+import { DropItem, DropZone } from "../../entities";
+import { collectDropzones } from "../../utils/collectDropzones";
 
 import { BrickwallProps, FinalReposition, Location } from "./Brickwall.models";
 
@@ -15,14 +15,11 @@ const Brickwall: React.FC<BrickwallProps> = ({
   const dropZones = React.useRef<DropZone[]>([]);
   const draggedElement = React.useRef<DropItem | null>(null);
 
-  const sleep = React.useRef(false);
   const finalReposition = React.useRef<FinalReposition>({});
   const currentFrom = React.useRef<Location>();
 
   const repositionChildren = React.useCallback((animated = true) => {
     if (!context.current) return;
-    sleep.current = true;
-    setTimeout(() => (sleep.current = false), 150);
 
     dropZones.current.forEach((dropZone) => {
       if (!dropZone.container.style.minHeight) dropZone.container.style.minHeight = "30px";
@@ -73,7 +70,7 @@ const Brickwall: React.FC<BrickwallProps> = ({
       context.current.onmousemove = (e) => {
         for (let i = 0; i < dropZones.current.length; i++) {
           const dropZone = dropZones.current[i];
-          if (!draggedElement.current || sleep.current) break;
+          if (!draggedElement.current) break;
           if (
             !dropZone.items.length &&
             e.clientX > dropZone.container.getBoundingClientRect().x &&
