@@ -1,6 +1,6 @@
 import { OnChildRepositionCallback } from "./../components/Brickwall/Brickwall.models";
 import { FinalReposition, Location } from "../components/Brickwall/Brickwall.models";
-import { collectDropzones } from "../utils/collectDropzones";
+import { hasBrickwallId } from "../utils/hasBrickwallId";
 
 import DropItem from "./DropItem";
 import DropZone from "./DropZone";
@@ -210,7 +210,7 @@ class DndController {
    */
   prepareDropzonesAndItems = () => {
     // TODO - move collectDropzones from utils to this class
-    this.dropZones = collectDropzones(this.contextWrapper);
+    this.dropZones = this.collectDropzones(this.contextWrapper);
 
     for (let i = 0; i < this.dropZones.length; i++) {
       const dropZone = this.dropZones[i];
@@ -230,6 +230,20 @@ class DndController {
         };
       });
     }
+  };
+
+  collectDropzones = (container: HTMLElement) => {
+    const dropzones: DropZone[] = [];
+
+    container.children.array().forEach((child) => {
+      if (hasBrickwallId(child)) {
+        dropzones.push(new DropZone(child));
+      } else {
+        dropzones.push(...this.collectDropzones(child));
+      }
+    });
+
+    return dropzones;
   };
 
   repositionItems = (animated: boolean = true) => {
