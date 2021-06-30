@@ -92,28 +92,31 @@ class DndController {
 
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
 
+  isHoveringOverEmptyDropZone = (dropZone: DropZone, e: MouseEvent) => {
+    const isDropZoneEmpty = !dropZone.items.length;
+    const isCursorInsideDropzone =
+      e.clientX > dropZone.container.getBoundingClientRect().x &&
+      e.clientX < dropZone.container.getBoundingClientRect().right &&
+      e.clientY > dropZone.container.getBoundingClientRect().y &&
+      e.clientY < dropZone.container.getBoundingClientRect().bottom;
+
+    return isDropZoneEmpty && isCursorInsideDropzone;
+  };
+
   handleContextWrapperMouseMove = (e: MouseEvent) => {
     this.dropZones.forEach((dropZone) => {
       if (!this.draggedItem) return;
 
-      if (
-        !dropZone.items.length &&
-        e.clientX > dropZone.container.getBoundingClientRect().x &&
-        e.clientX < dropZone.container.getBoundingClientRect().right &&
-        e.clientY > dropZone.container.getBoundingClientRect().y &&
-        e.clientY < dropZone.container.getBoundingClientRect().bottom
-      ) {
-        if (this.currentFrom) {
-          this.currentFrom.dropZone.removeItemAt(this.currentFrom.index);
-          dropZone.items.push(this.draggedItem);
-          this.draggedItem.updateDropZone(dropZone);
-          this.finalReposition.to = {
-            dropZone,
-            index: 0,
-          };
-          this.currentFrom = { dropZone, index: 0 };
-          this.repositionItems();
-        }
+      if (this.isHoveringOverEmptyDropZone(dropZone, e)) {
+        this.currentFrom?.dropZone.removeItemAt(this.currentFrom.index);
+        dropZone.items.push(this.draggedItem);
+        this.draggedItem.updateDropZone(dropZone);
+        this.finalReposition.to = {
+          dropZone,
+          index: 0,
+        };
+        this.currentFrom = { dropZone, index: 0 };
+        this.repositionItems();
         return;
       }
 
