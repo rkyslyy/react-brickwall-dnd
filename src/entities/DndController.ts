@@ -28,7 +28,9 @@ class DndController {
     this.onFinalItemsReposition = onFinalItemsReposition;
   }
 
-  setup = (contextWrapper: HTMLElement) => {
+  setup = (contextWrapper: HTMLElement | null) => {
+    if (!contextWrapper) return;
+
     this.prepareDocument();
     this.prepareContextWrapper(contextWrapper);
     this.prepareDropzonesAndItems();
@@ -84,9 +86,9 @@ class DndController {
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
 
   handleContextWrapperMouseMove = (e: MouseEvent) => {
-    for (let i = 0; i < this.dropZones.length; i++) {
-      const dropZone = this.dropZones[i];
-      if (!this.draggedItem) break;
+    this.dropZones.forEach((dropZone) => {
+      if (!this.draggedItem) return;
+
       if (
         !dropZone.items.length &&
         e.clientX > dropZone.container.getBoundingClientRect().x &&
@@ -105,13 +107,15 @@ class DndController {
           this.currentFrom = { dropZone, index: 0 };
           this.repositionItems();
         }
-        break;
+        return;
       }
-      for (let i = 0; i < dropZone.items.length; i++) {
-        const child = dropZone.items[i];
-        if (this.draggedItem === child) continue;
+
+      dropZone.items.forEach((child, i) => {
+        if (!this.draggedItem || this.draggedItem === child) return;
+
         if (child.isHovered(e)) {
           const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
+
           if (currentDraggableElementPosition === -1) {
             const potentialNewPosition = i + (child.isLeftSideHovered(e) ? 0 : 1);
             if (this.currentFrom) {
@@ -146,7 +150,7 @@ class DndController {
               this.repositionItems();
             }
           }
-          break;
+          return;
         } else if (
           dropZone.items[i + 1]?.rect().y !== child.rect().y &&
           child.hoveringNear(e)
@@ -179,8 +183,8 @@ class DndController {
             }
           }
         }
-      }
-    }
+      });
+    });
   };
 
   /**

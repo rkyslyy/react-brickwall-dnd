@@ -15,7 +15,7 @@ const Brickwall: React.FC<BrickwallProps> = ({
   );
 
   return (
-    <div className={wrapperClassname} ref={(r) => !!r && dndController.current.setup(r)}>
+    <div className={wrapperClassname} ref={dndController.current.setup}>
       {children}
     </div>
   );
