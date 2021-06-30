@@ -1,5 +1,5 @@
 import { OnChildRepositionCallback } from "./../components/Brickwall/Brickwall.models";
-import { FinalReposition, Location } from "../components/Brickwall/Brickwall.models";
+import { FinalReposition, DraggedItemSource } from "../components/Brickwall/Brickwall.models";
 import { hasBrickwallId } from "../utils/hasBrickwallId";
 
 import DropItem from "./DropItem";
@@ -24,7 +24,7 @@ class DndController {
   onFinalItemsReposition: OnChildRepositionCallback;
 
   finalReposition: FinalReposition = {};
-  currentFrom: Location | null = null;
+  latestDraggedItemSource: DraggedItemSource | null = null;
 
   constructor({ animationSpeed, gridGap, onFinalItemsReposition }: DndControllerOptions) {
     this.animationSpeed = animationSpeed;
@@ -87,7 +87,7 @@ class DndController {
     }
 
     this.finalReposition = {};
-    this.currentFrom = null;
+    this.latestDraggedItemSource = null;
   };
 
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
@@ -108,14 +108,16 @@ class DndController {
       if (!this.draggedItem) return;
 
       if (this.isHoveringOverEmptyDropZone(dropZone, e)) {
-        this.currentFrom?.dropZone.removeItemAt(this.currentFrom.index);
+        this.latestDraggedItemSource?.dropZone.removeItemAt(
+          this.latestDraggedItemSource.index
+        );
         dropZone.items.push(this.draggedItem);
         this.draggedItem.updateDropZone(dropZone);
         this.finalReposition.to = {
           dropZone,
           index: 0,
         };
-        this.currentFrom = { dropZone, index: 0 };
+        this.latestDraggedItemSource = { dropZone, index: 0 };
         this.repositionItems();
         return;
       }
@@ -128,14 +130,16 @@ class DndController {
 
           if (currentDraggableElementPosition === -1) {
             const potentialNewPosition = i + (child.isLeftSideHovered(e) ? 0 : 1);
-            if (this.currentFrom) {
-              this.currentFrom.dropZone.removeItemAt(this.currentFrom.index);
+            if (this.latestDraggedItemSource) {
+              this.latestDraggedItemSource.dropZone.removeItemAt(
+                this.latestDraggedItemSource.index
+              );
               dropZone.insertItemAt(potentialNewPosition, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
                 index: potentialNewPosition === -1 ? 0 : potentialNewPosition,
               };
-              this.currentFrom = { dropZone, index: potentialNewPosition };
+              this.latestDraggedItemSource = { dropZone, index: potentialNewPosition };
               this.repositionItems();
             }
           } else {
@@ -156,7 +160,7 @@ class DndController {
                 dropZone,
                 index: potentialNewPosition === -1 ? 0 : potentialNewPosition,
               };
-              this.currentFrom = { dropZone, index: potentialNewPosition };
+              this.latestDraggedItemSource = { dropZone, index: potentialNewPosition };
               this.repositionItems();
             }
           }
@@ -167,14 +171,16 @@ class DndController {
         ) {
           const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
           if (currentDraggableElementPosition === -1) {
-            if (this.currentFrom) {
-              this.currentFrom.dropZone.removeItemAt(this.currentFrom.index);
+            if (this.latestDraggedItemSource) {
+              this.latestDraggedItemSource.dropZone.removeItemAt(
+                this.latestDraggedItemSource.index
+              );
               dropZone.insertItemAt(i + 1, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
                 index: i + 1,
               };
-              this.currentFrom = { dropZone, index: i + 1 };
+              this.latestDraggedItemSource = { dropZone, index: i + 1 };
               this.repositionItems();
             }
           } else {
@@ -188,7 +194,7 @@ class DndController {
                 dropZone,
                 index: directionLeft ? i + 1 : i,
               };
-              this.currentFrom = { dropZone, index: directionLeft ? i + 1 : i };
+              this.latestDraggedItemSource = { dropZone, index: directionLeft ? i + 1 : i };
               this.repositionItems();
             }
           }
@@ -229,7 +235,7 @@ class DndController {
           item.applyMouseDownStyle(e);
           this.draggedItem = item;
           this.finalReposition.from = { dropZone, index };
-          this.currentFrom = { dropZone, index };
+          this.latestDraggedItemSource = { dropZone, index };
         };
       });
     }

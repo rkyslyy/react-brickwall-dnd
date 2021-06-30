@@ -14,12 +14,12 @@ export interface BrickwallProps {
   onChildrenReposition: OnChildRepositionCallback;
 }
 
-export interface Location {
+export interface DraggedItemSource {
   dropZone: DropZone;
   index: number;
 }
 
 export interface FinalReposition {
-  from?: Location;
-  to?: Location;
+  from?: DraggedItemSource;
+  to?: DraggedItemSource;
 }
