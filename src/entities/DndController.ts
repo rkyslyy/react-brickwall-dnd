@@ -24,7 +24,7 @@ class DndController {
   onFinalItemsReposition: OnChildRepositionCallback;
 
   finalReposition: FinalReposition = {};
-  latestDraggedItemSource: DraggedItemSource | null = null;
+  latestHoveredDropZone: DraggedItemSource | null = null;
 
   constructor({ animationSpeed, gridGap, onFinalItemsReposition }: DndControllerOptions) {
     this.animationSpeed = animationSpeed;
@@ -87,12 +87,12 @@ class DndController {
     }
 
     this.finalReposition = {};
-    this.latestDraggedItemSource = null;
+    this.latestHoveredDropZone = null;
   };
 
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
 
-  isHoveringOverEmptyDropZone = (dropZone: DropZone, e: MouseEvent) => {
+  isDraggingOverEmptyDropZone = (dropZone: DropZone, e: MouseEvent) => {
     const isDropZoneEmpty = !dropZone.items.length;
     const isCursorInsideDropzone =
       e.clientX > dropZone.container.getBoundingClientRect().x &&
@@ -103,21 +103,33 @@ class DndController {
     return isDropZoneEmpty && isCursorInsideDropzone;
   };
 
+  dropItemInEmptyDropZone = (newDropZone: DropZone, item: DropItem, newIndex = 0) => {
+    if (this.latestHoveredDropZone) {
+      const { dropZone, index } = this.latestHoveredDropZone;
+      dropZone.removeItemAt(index);
+    }
+
+    newDropZone.items.push(item);
+    item.updateDropZone(newDropZone);
+
+    this.finalReposition.to = { dropZone: newDropZone, index: newIndex };
+    this.latestHoveredDropZone = { dropZone: newDropZone, index: newIndex };
+  };
+
   handleContextWrapperMouseMove = (e: MouseEvent) => {
     this.dropZones.forEach((dropZone) => {
       if (!this.draggedItem) return;
 
-      if (this.isHoveringOverEmptyDropZone(dropZone, e)) {
-        this.latestDraggedItemSource?.dropZone.removeItemAt(
-          this.latestDraggedItemSource.index
-        );
-        dropZone.items.push(this.draggedItem);
-        this.draggedItem.updateDropZone(dropZone);
-        this.finalReposition.to = {
-          dropZone,
-          index: 0,
-        };
-        this.latestDraggedItemSource = { dropZone, index: 0 };
+      if (this.isDraggingOverEmptyDropZone(dropZone, e)) {
+        // this.latestHoveredDropZone?.dropZone.removeItemAt(this.latestHoveredDropZone.index);
+        // dropZone.items.push(this.draggedItem);
+        // this.draggedItem.updateDropZone(dropZone);
+        // this.finalReposition.to = {
+        //   dropZone,
+        //   index: 0,
+        // };
+        // this.latestHoveredDropZone = { dropZone, index: 0 };
+        this.dropItemInEmptyDropZone(dropZone, this.draggedItem);
         this.repositionItems();
         return;
       }
@@ -130,16 +142,16 @@ class DndController {
 
           if (currentDraggableElementPosition === -1) {
             const potentialNewPosition = i + (child.isLeftSideHovered(e) ? 0 : 1);
-            if (this.latestDraggedItemSource) {
-              this.latestDraggedItemSource.dropZone.removeItemAt(
-                this.latestDraggedItemSource.index
+            if (this.latestHoveredDropZone) {
+              this.latestHoveredDropZone.dropZone.removeItemAt(
+                this.latestHoveredDropZone.index
               );
               dropZone.insertItemAt(potentialNewPosition, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
                 index: potentialNewPosition === -1 ? 0 : potentialNewPosition,
               };
-              this.latestDraggedItemSource = { dropZone, index: potentialNewPosition };
+              this.latestHoveredDropZone = { dropZone, index: potentialNewPosition };
               this.repositionItems();
             }
           } else {
@@ -160,7 +172,7 @@ class DndController {
                 dropZone,
                 index: potentialNewPosition === -1 ? 0 : potentialNewPosition,
               };
-              this.latestDraggedItemSource = { dropZone, index: potentialNewPosition };
+              this.latestHoveredDropZone = { dropZone, index: potentialNewPosition };
               this.repositionItems();
             }
           }
@@ -171,16 +183,16 @@ class DndController {
         ) {
           const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
           if (currentDraggableElementPosition === -1) {
-            if (this.latestDraggedItemSource) {
-              this.latestDraggedItemSource.dropZone.removeItemAt(
-                this.latestDraggedItemSource.index
+            if (this.latestHoveredDropZone) {
+              this.latestHoveredDropZone.dropZone.removeItemAt(
+                this.latestHoveredDropZone.index
               );
               dropZone.insertItemAt(i + 1, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
                 index: i + 1,
               };
-              this.latestDraggedItemSource = { dropZone, index: i + 1 };
+              this.latestHoveredDropZone = { dropZone, index: i + 1 };
               this.repositionItems();
             }
           } else {
@@ -194,7 +206,7 @@ class DndController {
                 dropZone,
                 index: directionLeft ? i + 1 : i,
               };
-              this.latestDraggedItemSource = { dropZone, index: directionLeft ? i + 1 : i };
+              this.latestHoveredDropZone = { dropZone, index: directionLeft ? i + 1 : i };
               this.repositionItems();
             }
           }
@@ -235,7 +247,7 @@ class DndController {
           item.applyMouseDownStyle(e);
           this.draggedItem = item;
           this.finalReposition.from = { dropZone, index };
-          this.latestDraggedItemSource = { dropZone, index };
+          this.latestHoveredDropZone = { dropZone, index };
         };
       });
     }
