@@ -83,6 +83,106 @@ class DndController {
 
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
 
+  handleContextWrapperMouseMove = (e: MouseEvent) => {
+    for (let i = 0; i < this.dropZones.length; i++) {
+      const dropZone = this.dropZones[i];
+      if (!this.draggedItem) break;
+      if (
+        !dropZone.items.length &&
+        e.clientX > dropZone.container.getBoundingClientRect().x &&
+        e.clientX < dropZone.container.getBoundingClientRect().right &&
+        e.clientY > dropZone.container.getBoundingClientRect().y &&
+        e.clientY < dropZone.container.getBoundingClientRect().bottom
+      ) {
+        if (this.currentFrom) {
+          this.currentFrom.dropZone.removeItemAt(this.currentFrom.index);
+          dropZone.items.push(this.draggedItem);
+          this.draggedItem.updateDropZone(dropZone);
+          this.finalReposition.to = {
+            dropZone,
+            index: 0,
+          };
+          this.currentFrom = { dropZone, index: 0 };
+          this.repositionItems();
+        }
+        break;
+      }
+      for (let i = 0; i < dropZone.items.length; i++) {
+        const child = dropZone.items[i];
+        if (this.draggedItem === child) continue;
+        if (child.isHovered(e)) {
+          const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
+          if (currentDraggableElementPosition === -1) {
+            const potentialNewPosition = i + (child.isLeftSideHovered(e) ? 0 : 1);
+            if (this.currentFrom) {
+              this.currentFrom.dropZone.removeItemAt(this.currentFrom.index);
+              dropZone.insertItemAt(potentialNewPosition, this.draggedItem);
+              this.finalReposition.to = {
+                dropZone,
+                index: potentialNewPosition === -1 ? 0 : potentialNewPosition,
+              };
+              this.currentFrom = { dropZone, index: potentialNewPosition };
+              this.repositionItems();
+            }
+          } else {
+            const isLeftSideHovered = child.isLeftSideHovered(e);
+            const directionLeft = currentDraggableElementPosition > i;
+            let pp: number;
+            if (isLeftSideHovered && !directionLeft) pp = i - 1;
+            else if (isLeftSideHovered && directionLeft) pp = i;
+            else if (!isLeftSideHovered && !directionLeft) pp = i;
+            else pp = i + 1;
+            const potentialNewPosition = pp;
+            if (potentialNewPosition !== currentDraggableElementPosition) {
+              dropZone.switchItemPosition(
+                currentDraggableElementPosition,
+                potentialNewPosition === -1 ? 0 : potentialNewPosition
+              );
+              this.finalReposition.to = {
+                dropZone,
+                index: potentialNewPosition === -1 ? 0 : potentialNewPosition,
+              };
+              this.currentFrom = { dropZone, index: potentialNewPosition };
+              this.repositionItems();
+            }
+          }
+          break;
+        } else if (
+          dropZone.items[i + 1]?.rect().y !== child.rect().y &&
+          child.hoveringNear(e)
+        ) {
+          const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
+          if (currentDraggableElementPosition === -1) {
+            if (this.currentFrom) {
+              this.currentFrom.dropZone.removeItemAt(this.currentFrom.index);
+              dropZone.insertItemAt(i + 1, this.draggedItem);
+              this.finalReposition.to = {
+                dropZone,
+                index: i + 1,
+              };
+              this.currentFrom = { dropZone, index: i + 1 };
+              this.repositionItems();
+            }
+          } else {
+            if (currentDraggableElementPosition !== i) {
+              const directionLeft = currentDraggableElementPosition > i;
+              dropZone.switchItemPosition(
+                currentDraggableElementPosition,
+                directionLeft ? i + 1 : i
+              );
+              this.finalReposition.to = {
+                dropZone,
+                index: directionLeft ? i + 1 : i,
+              };
+              this.currentFrom = { dropZone, index: directionLeft ? i + 1 : i };
+              this.repositionItems();
+            }
+          }
+        }
+      }
+    }
+  };
+
   /**
    * Setup all positioning calculations.
    * TODO - refactor this horrible mess
@@ -91,106 +191,7 @@ class DndController {
     this.contextWrapper = contextWrapper;
     contextWrapper.style.display = "flex";
     contextWrapper.style.position = "relative";
-
-    contextWrapper.onmousemove = (e) => {
-      for (let i = 0; i < this.dropZones.length; i++) {
-        const dropZone = this.dropZones[i];
-        if (!this.draggedItem) break;
-        if (
-          !dropZone.items.length &&
-          e.clientX > dropZone.container.getBoundingClientRect().x &&
-          e.clientX < dropZone.container.getBoundingClientRect().right &&
-          e.clientY > dropZone.container.getBoundingClientRect().y &&
-          e.clientY < dropZone.container.getBoundingClientRect().bottom
-        ) {
-          if (this.currentFrom) {
-            this.currentFrom.dropZone.removeItemAt(this.currentFrom.index);
-            dropZone.items.push(this.draggedItem);
-            this.draggedItem.updateDropZone(dropZone);
-            this.finalReposition.to = {
-              dropZone,
-              index: 0,
-            };
-            this.currentFrom = { dropZone, index: 0 };
-            this.repositionItems();
-          }
-          break;
-        }
-        for (let i = 0; i < dropZone.items.length; i++) {
-          const child = dropZone.items[i];
-          if (this.draggedItem === child) continue;
-          if (child.isHovered(e)) {
-            const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
-            if (currentDraggableElementPosition === -1) {
-              const potentialNewPosition = i + (child.isLeftSideHovered(e) ? 0 : 1);
-              if (this.currentFrom) {
-                this.currentFrom.dropZone.removeItemAt(this.currentFrom.index);
-                dropZone.insertItemAt(potentialNewPosition, this.draggedItem);
-                this.finalReposition.to = {
-                  dropZone,
-                  index: potentialNewPosition === -1 ? 0 : potentialNewPosition,
-                };
-                this.currentFrom = { dropZone, index: potentialNewPosition };
-                this.repositionItems();
-              }
-            } else {
-              const isLeftSideHovered = child.isLeftSideHovered(e);
-              const directionLeft = currentDraggableElementPosition > i;
-              let pp: number;
-              if (isLeftSideHovered && !directionLeft) pp = i - 1;
-              else if (isLeftSideHovered && directionLeft) pp = i;
-              else if (!isLeftSideHovered && !directionLeft) pp = i;
-              else pp = i + 1;
-              const potentialNewPosition = pp;
-              if (potentialNewPosition !== currentDraggableElementPosition) {
-                dropZone.switchItemPosition(
-                  currentDraggableElementPosition,
-                  potentialNewPosition === -1 ? 0 : potentialNewPosition
-                );
-                this.finalReposition.to = {
-                  dropZone,
-                  index: potentialNewPosition === -1 ? 0 : potentialNewPosition,
-                };
-                this.currentFrom = { dropZone, index: potentialNewPosition };
-                this.repositionItems();
-              }
-            }
-            break;
-          } else if (
-            dropZone.items[i + 1]?.rect().y !== child.rect().y &&
-            child.hoveringNear(e)
-          ) {
-            const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
-            if (currentDraggableElementPosition === -1) {
-              if (this.currentFrom) {
-                this.currentFrom.dropZone.removeItemAt(this.currentFrom.index);
-                dropZone.insertItemAt(i + 1, this.draggedItem);
-                this.finalReposition.to = {
-                  dropZone,
-                  index: i + 1,
-                };
-                this.currentFrom = { dropZone, index: i + 1 };
-                this.repositionItems();
-              }
-            } else {
-              if (currentDraggableElementPosition !== i) {
-                const directionLeft = currentDraggableElementPosition > i;
-                dropZone.switchItemPosition(
-                  currentDraggableElementPosition,
-                  directionLeft ? i + 1 : i
-                );
-                this.finalReposition.to = {
-                  dropZone,
-                  index: directionLeft ? i + 1 : i,
-                };
-                this.currentFrom = { dropZone, index: directionLeft ? i + 1 : i };
-                this.repositionItems();
-              }
-            }
-          }
-        }
-      }
-    };
+    contextWrapper.onmousemove = this.handleContextWrapperMouseMove;
   };
 
   /**
