@@ -8,6 +8,7 @@ export type OnChildRepositionCallback = (
 ) => void;
 
 export interface BrickwallProps {
+  animationSpeed?: number;
   gridGap?: number;
   wrapperClassname?: string;
   onChildrenReposition: OnChildRepositionCallback;

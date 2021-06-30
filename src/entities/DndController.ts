@@ -7,6 +7,7 @@ import DropZone from "./DropZone";
 import { wait } from "../utils/wait";
 
 interface DndControllerOptions {
+  animationSpeed: number;
   gridGap: number;
   onFinalItemsReposition: OnChildRepositionCallback;
 }
@@ -18,13 +19,15 @@ class DndController {
   dropItems: DropItem[] = [];
   draggedItem: DropItem | null = null;
 
+  animationSpeed: number;
   gridGap: number;
   onFinalItemsReposition: OnChildRepositionCallback;
 
   finalReposition: FinalReposition = {};
   currentFrom: Location | null = null;
 
-  constructor({ gridGap, onFinalItemsReposition }: DndControllerOptions) {
+  constructor({ animationSpeed, gridGap, onFinalItemsReposition }: DndControllerOptions) {
+    this.animationSpeed = animationSpeed;
     this.gridGap = gridGap;
     this.onFinalItemsReposition = onFinalItemsReposition;
   }
@@ -72,16 +75,17 @@ class DndController {
 
     this.repositionItems();
 
-    // setTimeout() needed to not interrupt animation after mouse button is released
-    await wait(150); // TODO - no magic numbers
+    await wait(this.animationSpeed); // to not interrupt final animation
 
-    if (!!this.finalReposition.from && !!this.finalReposition.to)
+    if (!!this.finalReposition.from && !!this.finalReposition.to) {
       this.onFinalItemsReposition(
         this.finalReposition.from.dropZone.id,
         this.finalReposition.from.index,
         this.finalReposition.to.dropZone.id,
         this.finalReposition.to.index
       );
+    }
+
     this.finalReposition = {};
     this.currentFrom = null;
   };
