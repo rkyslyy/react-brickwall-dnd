@@ -10,7 +10,6 @@ export class DropZone {
 
   constructor(container: HTMLElement) {
     this.container = container;
-    container.style.transition = "height .2s ease";
     this.items = makeArayOfElements(container.children).map(
       (element) => new DropItem(this, element)
     );
@@ -19,6 +18,8 @@ export class DropZone {
   get id() {
     return this.container.id;
   }
+
+  allowStretching = () => (this.container.style.transition = "height .2s ease");
 
   indexOfItem = (item: DropItem) => this.items.indexOf(item);
 

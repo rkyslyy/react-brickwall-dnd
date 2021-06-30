@@ -4,6 +4,7 @@ import { collectDropzones } from "../utils/collectDropzones";
 
 import DropItem from "./DropItem";
 import DropZone from "./DropZone";
+import { wait } from "../utils/wait";
 
 interface DndControllerOptions {
   gridGap: number;
@@ -36,7 +37,10 @@ class DndController {
     this.prepareDropzonesAndItems();
 
     // Initial positioning
-    this.repositionItems();
+    this.repositionItems(false);
+
+    // Enable stretch animation on dropzones
+    process.nextTick(() => this.dropZones.forEach((dropZone) => dropZone.allowStretching()));
   };
 
   /**
@@ -58,7 +62,7 @@ class DndController {
    * 1. Animate placing dragged item in the new position.
    * 2. Notify parent about final changes.
    */
-  clearDraggedItem = () => {
+  clearDraggedItem = async () => {
     if (!this.draggedItem) return;
 
     this.draggedItem.self.style.zIndex = "1";
@@ -69,18 +73,17 @@ class DndController {
     this.repositionItems();
 
     // setTimeout() needed to not interrupt animation after mouse button is released
-    setTimeout(() => {
-      if (this.finalReposition.from !== undefined && this.finalReposition.to !== undefined)
-        this.onFinalItemsReposition(
-          this.finalReposition.from.dropZone.id,
-          this.finalReposition.from.index,
-          this.finalReposition.to.dropZone.id,
-          this.finalReposition.to.index
-        );
-      this.finalReposition = {};
-      this.currentFrom = null;
-      // TODO - no magic numbers
-    }, 150);
+    await wait(150); // TODO - no magic numbers
+
+    if (!!this.finalReposition.from && !!this.finalReposition.to)
+      this.onFinalItemsReposition(
+        this.finalReposition.from.dropZone.id,
+        this.finalReposition.from.index,
+        this.finalReposition.to.dropZone.id,
+        this.finalReposition.to.index
+      );
+    this.finalReposition = {};
+    this.currentFrom = null;
   };
 
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
