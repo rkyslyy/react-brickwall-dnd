@@ -103,7 +103,10 @@ class DndController {
     return isDropZoneEmpty && isCursorInsideDropzone;
   };
 
+  // TODO - rename "drop" to something else
   dropItemInEmptyDropZone = (newDropZone: DropZone, item: DropItem, newIndex = 0) => {
+    //eslint-disable-next-line
+    console.log("DROPPING IN EMPTY DZ");
     if (this.latestHoveredDropZone) {
       const { dropZone, index } = this.latestHoveredDropZone;
       dropZone.removeItemAt(index);
@@ -130,16 +133,37 @@ class DndController {
         if (!this.draggedItem || this.draggedItem === child) return;
 
         if (child.isHovered(e)) {
-          const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
+          const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
+
+          //eslint-disable-next-line
+          // console.log(
+          //   "INDEX OF",
+          //   this.draggedItem.self.textContent,
+          //   "IN DZ",
+          //   dropZone.id,
+          //   "=",
+          //   draggedItemIndexInDropZone
+          // );
 
           // Dragged item is from another dropzone
-          if (currentDraggableElementPosition === -1) {
+          if (draggedItemIndexInDropZone === -1) {
             const potentialNewPosition = i + (child.isLeftSideHovered(e) ? 0 : 1);
+            //eslint-disable-next-line
+            console.log("DROPPING IN DIFFERENT DROPZONE", dropZone.id);
 
             if (this.latestHoveredDropZone) {
+              //eslint-disable-next-line
+              console.log(
+                "REMOVING FROM",
+                this.latestHoveredDropZone.dropZone.id,
+                "AT",
+                this.latestHoveredDropZone.index
+              );
               this.latestHoveredDropZone.dropZone.removeItemAt(
                 this.latestHoveredDropZone.index
               );
+
+              console.log("INSERTING IN", dropZone.id, "AT", potentialNewPosition);
               dropZone.insertItemAt(potentialNewPosition, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
@@ -149,17 +173,20 @@ class DndController {
               this.repositionItems();
             }
           } else {
+            //eslint-disable-next-line
+            console.log("DROPPING IN SAME DZ", dropZone.id);
+            // TODO - too many enters
             const isLeftSideHovered = child.isLeftSideHovered(e);
-            const directionLeft = currentDraggableElementPosition > i;
+            const directionLeft = draggedItemIndexInDropZone > i;
             let pp: number;
             if (isLeftSideHovered && !directionLeft) pp = i - 1;
             else if (isLeftSideHovered && directionLeft) pp = i;
             else if (!isLeftSideHovered && !directionLeft) pp = i;
             else pp = i + 1;
             const potentialNewPosition = pp;
-            if (potentialNewPosition !== currentDraggableElementPosition) {
+            if (potentialNewPosition !== draggedItemIndexInDropZone) {
               dropZone.switchItemPosition(
-                currentDraggableElementPosition,
+                draggedItemIndexInDropZone,
                 potentialNewPosition === -1 ? 0 : potentialNewPosition
               );
               this.finalReposition.to = {
@@ -170,17 +197,29 @@ class DndController {
               this.repositionItems();
             }
           }
-          return;
         } else if (
           dropZone.items[i + 1]?.rect().y !== child.rect().y &&
           child.hoveringNear(e)
         ) {
+          //eslint-disable-next-line
+          console.log("WE HERE BOBO");
           const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
+
           if (currentDraggableElementPosition === -1) {
+            //eslint-disable-next-line
+            console.log("NOT FOUND");
             if (this.latestHoveredDropZone) {
+              console.log(
+                "REMOVING FROM",
+                this.latestHoveredDropZone.dropZone.id,
+                "AT",
+                this.latestHoveredDropZone.index
+              );
               this.latestHoveredDropZone.dropZone.removeItemAt(
                 this.latestHoveredDropZone.index
               );
+
+              console.log("INSERTING IN", dropZone.id, "AT", i + 1);
               dropZone.insertItemAt(i + 1, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
@@ -190,7 +229,10 @@ class DndController {
               this.repositionItems();
             }
           } else {
+            console.log("FOUND");
             if (currentDraggableElementPosition !== i) {
+              //eslint-disable-next-line
+              console.log("XX");
               const directionLeft = currentDraggableElementPosition > i;
               dropZone.switchItemPosition(
                 currentDraggableElementPosition,
@@ -240,10 +282,14 @@ class DndController {
 
           item.applyMouseDownStyle(e);
           this.draggedItem = item;
-          this.finalReposition.from = { dropZone, index: dropZone.items.lastIndexOf(item) };
-          this.latestHoveredDropZone = { dropZone, index: dropZone.items.lastIndexOf(item) };
-          //eslint-disable-next-line
-          console.log("CURRENT");
+          this.finalReposition.from = {
+            dropZone: item.dropZone,
+            index: item.dropZone.items.lastIndexOf(item),
+          };
+          this.latestHoveredDropZone = {
+            dropZone: item.dropZone,
+            index: item.dropZone.items.lastIndexOf(item),
+          };
         };
       });
     }
