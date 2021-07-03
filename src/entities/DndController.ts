@@ -137,7 +137,11 @@ class DndController {
       dropZone.items.forEach((item, itemIndex) => {
         if (!this.draggedItem || this.draggedItem === item) return;
 
-        if (item.isHovered(e)) {
+        const isItemHovered = item.isHovered(e);
+        const isHoveringFreeSpaceNearItem =
+          dropZone.items[itemIndex + 1]?.rect().y !== item.rect().y && item.hoveringNear(e);
+
+        if (isItemHovered) {
           const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
 
           // Dragged item is from another dropzone
@@ -171,11 +175,7 @@ class DndController {
           }
 
           // Check if next item is on next row and hovering over free space near current item
-        } else if (
-          dropZone.items[itemIndex + 1]?.rect().y !== item.rect().y &&
-          item.hoveringNear(e) &&
-          this.draggedItem !== item
-        ) {
+        } else if (isHoveringFreeSpaceNearItem) {
           const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
 
           if (draggedItemIndexInDropZone === -1) {
