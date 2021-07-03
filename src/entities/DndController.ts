@@ -170,13 +170,14 @@ class DndController {
           // Check if next item is on next row and hovering over free space near current item
         } else if (
           dropZone.items[itemIndex + 1]?.rect().y !== item.rect().y &&
-          item.hoveringNear(e)
+          item.hoveringNear(e) &&
+          this.draggedItem !== item
         ) {
           const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
 
           if (draggedItemIndexInDropZone === -1) {
             this.placeDraggedItemInNewDropZone(dropZone, this.draggedItem, itemIndex + 1);
-          } else if (draggedItemIndexInDropZone !== itemIndex) {
+          } else {
             const directionLeft = draggedItemIndexInDropZone > itemIndex;
 
             dropZone.switchItemPosition(
