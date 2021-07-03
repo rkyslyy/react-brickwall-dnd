@@ -104,14 +104,14 @@ class DndController {
   };
 
   // TODO - rename "drop" to something else
-  placeDraggedItemInNewDropZone = (newDropZone: DropZone, item: DropItem, newIndex = 0) => {
+  placeDraggedItemInNewDropZone = (newDropZone: DropZone, item: DropItem, index = 0) => {
     this.latestHoveredDropZone?.dropZone.removeItemAt(this.latestHoveredDropZone.index);
 
-    newDropZone.insertItemAt(0, item);
+    newDropZone.insertItemAt(index, item);
     item.updateDropZone(newDropZone);
 
-    this.finalReposition.to = { dropZone: newDropZone, index: newIndex };
-    this.latestHoveredDropZone = { dropZone: newDropZone, index: newIndex };
+    this.finalReposition.to = { dropZone: newDropZone, index };
+    this.latestHoveredDropZone = { dropZone: newDropZone, index };
   };
 
   handlePositionSwitchInsideDropZone = (dropZone: DropZone, from: number, to: number) => {
@@ -175,9 +175,7 @@ class DndController {
           const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
 
           if (draggedItemIndexInDropZone === -1) {
-            if (this.latestHoveredDropZone) {
-              this.placeDraggedItemInNewDropZone(dropZone, this.draggedItem, itemIndex + 1);
-            }
+            this.placeDraggedItemInNewDropZone(dropZone, this.draggedItem, itemIndex + 1);
           } else if (draggedItemIndexInDropZone !== itemIndex) {
             const directionLeft = draggedItemIndexInDropZone > itemIndex;
 
