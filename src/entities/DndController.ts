@@ -105,12 +105,9 @@ class DndController {
 
   // TODO - rename "drop" to something else
   dropItemInEmptyDropZone = (newDropZone: DropZone, item: DropItem, newIndex = 0) => {
-    if (this.latestHoveredDropZone) {
-      const { dropZone, index } = this.latestHoveredDropZone;
-      dropZone.removeItemAt(index);
-    }
+    this.latestHoveredDropZone?.dropZone.removeItemAt(this.latestHoveredDropZone.index);
 
-    newDropZone.items.push(item);
+    newDropZone.insertItemAt(0, item);
     item.updateDropZone(newDropZone);
 
     this.finalReposition.to = { dropZone: newDropZone, index: newIndex };
@@ -127,38 +124,39 @@ class DndController {
         return;
       }
 
-      dropZone.items.forEach((child, i) => {
-        if (!this.draggedItem || this.draggedItem === child) return;
+      dropZone.items.forEach((item, itemPositionInDropZone) => {
+        if (!this.draggedItem || this.draggedItem === item) return;
 
-        if (child.isHovered(e)) {
+        if (item.isHovered(e)) {
           const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
 
           // Dragged item is from another dropzone
           if (draggedItemIndexInDropZone === -1) {
-            const potentialNewPosition = i + (child.isLeftSideHovered(e) ? 0 : 1);
+            const positionForDraggedItem =
+              itemPositionInDropZone + (item.isLeftSideHovered(e) ? 0 : 1);
 
             if (this.latestHoveredDropZone) {
               this.latestHoveredDropZone.dropZone.removeItemAt(
                 this.latestHoveredDropZone.index
               );
 
-              dropZone.insertItemAt(potentialNewPosition, this.draggedItem);
+              dropZone.insertItemAt(positionForDraggedItem, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
-                index: potentialNewPosition === -1 ? 0 : potentialNewPosition,
+                index: positionForDraggedItem === -1 ? 0 : positionForDraggedItem,
               };
-              this.latestHoveredDropZone = { dropZone, index: potentialNewPosition };
+              this.latestHoveredDropZone = { dropZone, index: positionForDraggedItem };
               this.repositionItems();
             }
           } else {
             // TODO - too many enters
-            const isLeftSideHovered = child.isLeftSideHovered(e);
-            const directionLeft = draggedItemIndexInDropZone > i;
+            const isLeftSideHovered = item.isLeftSideHovered(e);
+            const directionLeft = draggedItemIndexInDropZone > itemPositionInDropZone;
             let pp: number;
-            if (isLeftSideHovered && !directionLeft) pp = i - 1;
-            else if (isLeftSideHovered && directionLeft) pp = i;
-            else if (!isLeftSideHovered && !directionLeft) pp = i;
-            else pp = i + 1;
+            if (isLeftSideHovered && !directionLeft) pp = itemPositionInDropZone - 1;
+            else if (isLeftSideHovered && directionLeft) pp = itemPositionInDropZone;
+            else if (!isLeftSideHovered && !directionLeft) pp = itemPositionInDropZone;
+            else pp = itemPositionInDropZone + 1;
             const potentialNewPosition = pp;
             if (potentialNewPosition !== draggedItemIndexInDropZone) {
               dropZone.switchItemPosition(
@@ -174,8 +172,8 @@ class DndController {
             }
           }
         } else if (
-          dropZone.items[i + 1]?.rect().y !== child.rect().y &&
-          child.hoveringNear(e)
+          dropZone.items[itemPositionInDropZone + 1]?.rect().y !== item.rect().y &&
+          item.hoveringNear(e)
         ) {
           const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
 
@@ -185,26 +183,29 @@ class DndController {
                 this.latestHoveredDropZone.index
               );
 
-              dropZone.insertItemAt(i + 1, this.draggedItem);
+              dropZone.insertItemAt(itemPositionInDropZone + 1, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
-                index: i + 1,
+                index: itemPositionInDropZone + 1,
               };
-              this.latestHoveredDropZone = { dropZone, index: i + 1 };
+              this.latestHoveredDropZone = { dropZone, index: itemPositionInDropZone + 1 };
               this.repositionItems();
             }
           } else {
-            if (currentDraggableElementPosition !== i) {
-              const directionLeft = currentDraggableElementPosition > i;
+            if (currentDraggableElementPosition !== itemPositionInDropZone) {
+              const directionLeft = currentDraggableElementPosition > itemPositionInDropZone;
               dropZone.switchItemPosition(
                 currentDraggableElementPosition,
-                directionLeft ? i + 1 : i
+                directionLeft ? itemPositionInDropZone + 1 : itemPositionInDropZone
               );
               this.finalReposition.to = {
                 dropZone,
-                index: directionLeft ? i + 1 : i,
+                index: directionLeft ? itemPositionInDropZone + 1 : itemPositionInDropZone,
               };
-              this.latestHoveredDropZone = { dropZone, index: directionLeft ? i + 1 : i };
+              this.latestHoveredDropZone = {
+                dropZone,
+                index: directionLeft ? itemPositionInDropZone + 1 : itemPositionInDropZone,
+              };
               this.repositionItems();
             }
           }

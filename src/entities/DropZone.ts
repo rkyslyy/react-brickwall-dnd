@@ -6,7 +6,7 @@ const makeArayOfElements = (collection: HTMLCollection) => [
 
 export class DropZone {
   container: HTMLElement;
-  items: DropItem[];
+  items: DropItem[]; // TODO - make properties private
 
   constructor(container: HTMLElement) {
     this.container = container;
