@@ -166,13 +166,15 @@ class DndController {
               );
             }
           }
+
+          // Check if next item is on next row and hovering over free space near current item
         } else if (
           dropZone.items[hoveredItemIndex + 1]?.rect().y !== item.rect().y &&
           item.hoveringNear(e)
         ) {
-          const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
+          const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
 
-          if (currentDraggableElementPosition === -1) {
+          if (draggedItemIndexInDropZone === -1) {
             if (this.latestHoveredDropZone) {
               this.latestHoveredDropZone.dropZone.removeItemAt(
                 this.latestHoveredDropZone.index
@@ -186,23 +188,21 @@ class DndController {
               this.latestHoveredDropZone = { dropZone, index: hoveredItemIndex + 1 };
               this.repositionItems();
             }
-          } else {
-            if (currentDraggableElementPosition !== hoveredItemIndex) {
-              const directionLeft = currentDraggableElementPosition > hoveredItemIndex;
-              dropZone.switchItemPosition(
-                currentDraggableElementPosition,
-                directionLeft ? hoveredItemIndex + 1 : hoveredItemIndex
-              );
-              this.finalReposition.to = {
-                dropZone,
-                index: directionLeft ? hoveredItemIndex + 1 : hoveredItemIndex,
-              };
-              this.latestHoveredDropZone = {
-                dropZone,
-                index: directionLeft ? hoveredItemIndex + 1 : hoveredItemIndex,
-              };
-              this.repositionItems();
-            }
+          } else if (draggedItemIndexInDropZone !== hoveredItemIndex) {
+            const directionLeft = draggedItemIndexInDropZone > hoveredItemIndex;
+            dropZone.switchItemPosition(
+              draggedItemIndexInDropZone,
+              directionLeft ? hoveredItemIndex + 1 : hoveredItemIndex
+            );
+            this.finalReposition.to = {
+              dropZone,
+              index: directionLeft ? hoveredItemIndex + 1 : hoveredItemIndex,
+            };
+            this.latestHoveredDropZone = {
+              dropZone,
+              index: directionLeft ? hoveredItemIndex + 1 : hoveredItemIndex,
+            };
+            this.repositionItems();
           }
         }
       });
