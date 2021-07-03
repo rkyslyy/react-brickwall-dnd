@@ -1,7 +1,7 @@
 import React from "react";
 import { DEFAULT_ANIMATION_SPEED } from "../../constants";
 
-import DndController from "../../entities/DndController";
+import { DndController } from "../../entities";
 
 import { BrickwallProps } from "./Brickwall.models";
 
