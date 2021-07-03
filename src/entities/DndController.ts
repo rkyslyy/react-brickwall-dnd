@@ -112,12 +112,16 @@ class DndController {
 
     this.finalReposition.to = { dropZone: newDropZone, index };
     this.latestHoveredDropZone = { dropZone: newDropZone, index };
+
+    this.repositionItems();
   };
 
   handlePositionSwitchInsideDropZone = (dropZone: DropZone, from: number, to: number) => {
     dropZone.switchItemPosition(from, to);
+
     this.finalReposition.to = { dropZone, index: to };
     this.latestHoveredDropZone = { dropZone, index: to };
+
     this.repositionItems();
   };
 
@@ -127,7 +131,6 @@ class DndController {
 
       if (this.isDraggingOverEmptyDropZone(dropZone, e)) {
         this.placeDraggedItemInNewDropZone(dropZone, this.draggedItem);
-        this.repositionItems();
         return;
       }
 
@@ -180,19 +183,11 @@ class DndController {
           } else {
             const directionLeft = draggedItemIndexInDropZone > itemIndex;
 
-            dropZone.switchItemPosition(
+            this.handlePositionSwitchInsideDropZone(
+              dropZone,
               draggedItemIndexInDropZone,
               directionLeft ? itemIndex + 1 : itemIndex
             );
-            this.finalReposition.to = {
-              dropZone,
-              index: directionLeft ? itemIndex + 1 : itemIndex,
-            };
-            this.latestHoveredDropZone = {
-              dropZone,
-              index: directionLeft ? itemIndex + 1 : itemIndex,
-            };
-            this.repositionItems();
           }
         }
       });
