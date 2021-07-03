@@ -105,8 +105,6 @@ class DndController {
 
   // TODO - rename "drop" to something else
   dropItemInEmptyDropZone = (newDropZone: DropZone, item: DropItem, newIndex = 0) => {
-    //eslint-disable-next-line
-    console.log("DROPPING IN EMPTY DZ");
     if (this.latestHoveredDropZone) {
       const { dropZone, index } = this.latestHoveredDropZone;
       dropZone.removeItemAt(index);
@@ -135,35 +133,15 @@ class DndController {
         if (child.isHovered(e)) {
           const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
 
-          //eslint-disable-next-line
-          // console.log(
-          //   "INDEX OF",
-          //   this.draggedItem.self.textContent,
-          //   "IN DZ",
-          //   dropZone.id,
-          //   "=",
-          //   draggedItemIndexInDropZone
-          // );
-
           // Dragged item is from another dropzone
           if (draggedItemIndexInDropZone === -1) {
             const potentialNewPosition = i + (child.isLeftSideHovered(e) ? 0 : 1);
-            //eslint-disable-next-line
-            console.log("DROPPING IN DIFFERENT DROPZONE", dropZone.id);
 
             if (this.latestHoveredDropZone) {
-              //eslint-disable-next-line
-              console.log(
-                "REMOVING FROM",
-                this.latestHoveredDropZone.dropZone.id,
-                "AT",
-                this.latestHoveredDropZone.index
-              );
               this.latestHoveredDropZone.dropZone.removeItemAt(
                 this.latestHoveredDropZone.index
               );
 
-              console.log("INSERTING IN", dropZone.id, "AT", potentialNewPosition);
               dropZone.insertItemAt(potentialNewPosition, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
@@ -173,8 +151,6 @@ class DndController {
               this.repositionItems();
             }
           } else {
-            //eslint-disable-next-line
-            console.log("DROPPING IN SAME DZ", dropZone.id);
             // TODO - too many enters
             const isLeftSideHovered = child.isLeftSideHovered(e);
             const directionLeft = draggedItemIndexInDropZone > i;
@@ -201,25 +177,14 @@ class DndController {
           dropZone.items[i + 1]?.rect().y !== child.rect().y &&
           child.hoveringNear(e)
         ) {
-          //eslint-disable-next-line
-          console.log("WE HERE BOBO");
           const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
 
           if (currentDraggableElementPosition === -1) {
-            //eslint-disable-next-line
-            console.log("NOT FOUND");
             if (this.latestHoveredDropZone) {
-              console.log(
-                "REMOVING FROM",
-                this.latestHoveredDropZone.dropZone.id,
-                "AT",
-                this.latestHoveredDropZone.index
-              );
               this.latestHoveredDropZone.dropZone.removeItemAt(
                 this.latestHoveredDropZone.index
               );
 
-              console.log("INSERTING IN", dropZone.id, "AT", i + 1);
               dropZone.insertItemAt(i + 1, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
@@ -229,10 +194,7 @@ class DndController {
               this.repositionItems();
             }
           } else {
-            console.log("FOUND");
             if (currentDraggableElementPosition !== i) {
-              //eslint-disable-next-line
-              console.log("XX");
               const directionLeft = currentDraggableElementPosition > i;
               dropZone.switchItemPosition(
                 currentDraggableElementPosition,
