@@ -121,14 +121,6 @@ class DndController {
       if (!this.draggedItem) return;
 
       if (this.isDraggingOverEmptyDropZone(dropZone, e)) {
-        // this.latestHoveredDropZone?.dropZone.removeItemAt(this.latestHoveredDropZone.index);
-        // dropZone.items.push(this.draggedItem);
-        // this.draggedItem.updateDropZone(dropZone);
-        // this.finalReposition.to = {
-        //   dropZone,
-        //   index: 0,
-        // };
-        // this.latestHoveredDropZone = { dropZone, index: 0 };
         this.dropItemInEmptyDropZone(dropZone, this.draggedItem);
         this.repositionItems();
         return;
@@ -140,8 +132,10 @@ class DndController {
         if (child.isHovered(e)) {
           const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
 
+          // Dragged item is from another dropzone
           if (currentDraggableElementPosition === -1) {
             const potentialNewPosition = i + (child.isLeftSideHovered(e) ? 0 : 1);
+
             if (this.latestHoveredDropZone) {
               this.latestHoveredDropZone.dropZone.removeItemAt(
                 this.latestHoveredDropZone.index
@@ -238,7 +232,7 @@ class DndController {
 
       if (!dropZone.container.style.minHeight) dropZone.container.style.minHeight = "30px";
 
-      dropZone.items.forEach((item, index) => {
+      dropZone.items.forEach((item) => {
         item.self.style.position = "absolute";
 
         item.self.onmousedown = (e) => {
@@ -246,8 +240,10 @@ class DndController {
 
           item.applyMouseDownStyle(e);
           this.draggedItem = item;
-          this.finalReposition.from = { dropZone, index };
-          this.latestHoveredDropZone = { dropZone, index };
+          this.finalReposition.from = { dropZone, index: dropZone.items.lastIndexOf(item) };
+          this.latestHoveredDropZone = { dropZone, index: dropZone.items.lastIndexOf(item) };
+          //eslint-disable-next-line
+          console.log("CURRENT");
         };
       });
     }
