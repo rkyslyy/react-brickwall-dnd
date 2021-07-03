@@ -124,7 +124,7 @@ class DndController {
         return;
       }
 
-      dropZone.items.forEach((item, itemPositionInDropZone) => {
+      dropZone.items.forEach((item, itemIndex) => {
         if (!this.draggedItem || this.draggedItem === item) return;
 
         if (item.isHovered(e)) {
@@ -132,22 +132,24 @@ class DndController {
 
           // Dragged item is from another dropzone
           if (draggedItemIndexInDropZone === -1) {
-            const positionForDraggedItem =
-              itemPositionInDropZone + (item.isLeftSideHovered(e) ? 0 : 1);
+            const indexForDraggedItem = itemIndex + (item.isLeftSideHovered(e) ? 0 : 1);
+
             this.placeDraggedItemInNewDropZone(
               dropZone,
               this.draggedItem,
-              positionForDraggedItem
+              indexForDraggedItem
             );
+
+            // Dragged item is from same dropzone
           } else {
             // TODO - too many enters
             const isLeftSideHovered = item.isLeftSideHovered(e);
-            const directionLeft = draggedItemIndexInDropZone > itemPositionInDropZone;
+            const directionLeft = draggedItemIndexInDropZone > itemIndex;
             let pp: number;
-            if (isLeftSideHovered && !directionLeft) pp = itemPositionInDropZone - 1;
-            else if (isLeftSideHovered && directionLeft) pp = itemPositionInDropZone;
-            else if (!isLeftSideHovered && !directionLeft) pp = itemPositionInDropZone;
-            else pp = itemPositionInDropZone + 1;
+            if (isLeftSideHovered && !directionLeft) pp = itemIndex - 1;
+            else if (isLeftSideHovered && directionLeft) pp = itemIndex;
+            else if (!isLeftSideHovered && !directionLeft) pp = itemIndex;
+            else pp = itemIndex + 1;
             const potentialNewPosition = pp;
             if (potentialNewPosition !== draggedItemIndexInDropZone) {
               dropZone.switchItemPosition(
@@ -163,7 +165,7 @@ class DndController {
             }
           }
         } else if (
-          dropZone.items[itemPositionInDropZone + 1]?.rect().y !== item.rect().y &&
+          dropZone.items[itemIndex + 1]?.rect().y !== item.rect().y &&
           item.hoveringNear(e)
         ) {
           const currentDraggableElementPosition = dropZone.indexOfItem(this.draggedItem);
@@ -174,28 +176,28 @@ class DndController {
                 this.latestHoveredDropZone.index
               );
 
-              dropZone.insertItemAt(itemPositionInDropZone + 1, this.draggedItem);
+              dropZone.insertItemAt(itemIndex + 1, this.draggedItem);
               this.finalReposition.to = {
                 dropZone,
-                index: itemPositionInDropZone + 1,
+                index: itemIndex + 1,
               };
-              this.latestHoveredDropZone = { dropZone, index: itemPositionInDropZone + 1 };
+              this.latestHoveredDropZone = { dropZone, index: itemIndex + 1 };
               this.repositionItems();
             }
           } else {
-            if (currentDraggableElementPosition !== itemPositionInDropZone) {
-              const directionLeft = currentDraggableElementPosition > itemPositionInDropZone;
+            if (currentDraggableElementPosition !== itemIndex) {
+              const directionLeft = currentDraggableElementPosition > itemIndex;
               dropZone.switchItemPosition(
                 currentDraggableElementPosition,
-                directionLeft ? itemPositionInDropZone + 1 : itemPositionInDropZone
+                directionLeft ? itemIndex + 1 : itemIndex
               );
               this.finalReposition.to = {
                 dropZone,
-                index: directionLeft ? itemPositionInDropZone + 1 : itemPositionInDropZone,
+                index: directionLeft ? itemIndex + 1 : itemIndex,
               };
               this.latestHoveredDropZone = {
                 dropZone,
-                index: directionLeft ? itemPositionInDropZone + 1 : itemPositionInDropZone,
+                index: directionLeft ? itemIndex + 1 : itemIndex,
               };
               this.repositionItems();
             }
