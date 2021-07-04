@@ -14,6 +14,10 @@ export class Item {
     this.itemElement = element;
   }
 
+  get rect() {
+    return this.itemElement.getBoundingClientRect();
+  }
+
   toggleAnimation = (enabled: boolean, animationSpeed: number) => {
     this.itemElement.style.transition = enabled ? `all .${animationSpeed}s ease` : "";
   };
@@ -33,7 +37,7 @@ export class Item {
   };
 
   hoveringNear = ({ clientX, clientY }: MouseEvent) => {
-    const { right, y } = this.rect();
+    const { right, y } = this.rect;
 
     return (
       clientX > right &&
@@ -44,12 +48,12 @@ export class Item {
   };
 
   isHovered = ({ clientX, clientY }: MouseEvent) => {
-    const { x, y, right, bottom } = this.rect();
+    const { x, y, right, bottom } = this.rect;
     return clientX > x && clientX < right && clientY > y && clientY < bottom;
   };
 
   isLeftSideHovered = ({ clientX }: MouseEvent) => {
-    const { x, width } = this.rect();
+    const { x, width } = this.rect;
     return clientX < x + width / 2;
   };
 
@@ -101,8 +105,6 @@ export class Item {
       yOffset
     }px`;
   };
-
-  rect = () => this.itemElement.getBoundingClientRect();
 
   updateDropzone = (newDropzone: Dropzone) => (this.dropzone = newDropzone);
 }

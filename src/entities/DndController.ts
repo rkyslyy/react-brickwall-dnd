@@ -44,7 +44,9 @@ class DndController {
     this.repositionItems(false);
 
     // Enable stretch animation on dropzones
-    process.nextTick(() => this.dropzones.forEach((dropzone) => dropzone.allowStretching()));
+    process.nextTick(() =>
+      this.dropzones.forEach((dropzone) => dropzone.allowStretching(this.animationSpeed))
+    );
   };
 
   /**
@@ -301,8 +303,8 @@ class DndController {
         xOffset += item.getFullWidth() + this.gridGap;
 
         // Extend resulting container height if item won't fit in current row
-        if (item.rect().height + yOffset > resultingContainerHeight)
-          resultingContainerHeight = yOffset + item.rect().height + this.gridGap;
+        if (item.rect.height + yOffset > resultingContainerHeight)
+          resultingContainerHeight = yOffset + item.rect.height + this.gridGap;
       });
 
       // Extend container height

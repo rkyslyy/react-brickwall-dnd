@@ -27,7 +27,8 @@ export class Dropzone {
     return this._items;
   }
 
-  allowStretching = () => (this._container.style.transition = "height .2s ease");
+  allowStretching = (animationSpeed: number) =>
+    (this._container.style.transition = `height .${animationSpeed}s ease`);
 
   indexOfItem = (item: Item) => this._items.indexOf(item);
 
@@ -45,7 +46,7 @@ export class Dropzone {
     const itemIndex = this._items.lastIndexOf(item);
     const nextItem = itemIndex === -1 ? null : this._items[itemIndex + 1];
 
-    const isNextItemOnNextRow = nextItem?.rect().y !== item.rect().y;
+    const isNextItemOnNextRow = nextItem?.rect.y !== item.rect.y;
 
     return isNextItemOnNextRow && item.hoveringNear(e);
   };
