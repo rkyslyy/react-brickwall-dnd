@@ -5,7 +5,7 @@ export interface Offset {
   yOffset: number;
 }
 
-export class DropItem {
+export class Item {
   dropzone: Dropzone;
   self: HTMLElement;
 
@@ -95,4 +95,4 @@ export class DropItem {
   updateDropzone = (newDropzone: Dropzone) => (this.dropzone = newDropzone);
 }
 
-export default DropItem;
+export default Item;

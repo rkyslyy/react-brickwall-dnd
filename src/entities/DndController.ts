@@ -2,7 +2,7 @@ import { OnChildRepositionCallback } from "./../components/Brickwall/Brickwall.m
 import { FinalReposition, DraggedItemSource } from "../components/Brickwall/Brickwall.models";
 import { hasBrickwallId } from "../utils/hasBrickwallId";
 
-import DropItem from "./DropItem";
+import Item from "./DropItem";
 import Dropzone from "./Dropzone";
 import { wait } from "../utils/wait";
 
@@ -16,8 +16,8 @@ class DndController {
   contextWrapper: HTMLElement;
 
   dropzones: Dropzone[] = [];
-  dropItems: DropItem[] = [];
-  draggedItem: DropItem | null = null;
+  dropItems: Item[] = [];
+  draggedItem: Item | null = null;
 
   animationSpeed: number;
   gridGap: number;
@@ -103,7 +103,7 @@ class DndController {
     return isDropzoneEmpty && isCursorInsideDropzone;
   };
 
-  placeDraggedItemInNewDropzone = (newDropzone: Dropzone, item: DropItem, index = 0) => {
+  placeDraggedItemInNewDropzone = (newDropzone: Dropzone, item: Item, index = 0) => {
     this.latestHoveredDropzone?.dropzone.removeItemAt(this.latestHoveredDropzone.index);
 
     newDropzone.insertItemAt(index, item);
@@ -137,8 +137,7 @@ class DndController {
         if (!this.draggedItem || this.draggedItem === item) return;
 
         const isItemHovered = item.isHovered(e);
-        const isHoveringFreeSpaceNearItem =
-          dropzone.items[itemIndex + 1]?.rect().y !== item.rect().y && item.hoveringNear(e);
+        const isHoveringFreeSpaceNearItem = dropzone.isHoveringFreeSpaceNearItem(item, e);
         const draggedItemIndexInDropzone = dropzone.indexOfItem(this.draggedItem);
 
         if (isItemHovered) {
@@ -153,7 +152,7 @@ class DndController {
   handleItemHovered = (
     dropzone: Dropzone,
     draggedItemIndexInDropzone: number,
-    hoveredItem: DropItem,
+    hoveredItem: Item,
     hoveredItemIndex: number,
     e: MouseEvent
   ) => {
