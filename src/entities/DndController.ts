@@ -3,7 +3,7 @@ import { FinalReposition, DraggedItemSource } from "../components/Brickwall/Bric
 import { hasBrickwallId } from "../utils/hasBrickwallId";
 
 import DropItem from "./DropItem";
-import DropZone from "./DropZone";
+import Dropzone from "./Dropzone";
 import { wait } from "../utils/wait";
 
 interface DndControllerOptions {
@@ -15,7 +15,7 @@ interface DndControllerOptions {
 class DndController {
   contextWrapper: HTMLElement;
 
-  dropZones: DropZone[] = [];
+  dropzones: Dropzone[] = [];
   dropItems: DropItem[] = [];
   draggedItem: DropItem | null = null;
 
@@ -24,7 +24,7 @@ class DndController {
   onFinalItemsReposition: OnChildRepositionCallback;
 
   finalReposition: FinalReposition = {};
-  latestHoveredDropZone: DraggedItemSource | null = null;
+  latestHoveredDropzone: DraggedItemSource | null = null;
 
   constructor({ animationSpeed, gridGap, onFinalItemsReposition }: DndControllerOptions) {
     this.animationSpeed = animationSpeed;
@@ -43,7 +43,7 @@ class DndController {
     this.repositionItems(false);
 
     // Enable stretch animation on dropzones
-    process.nextTick(() => this.dropZones.forEach((dropZone) => dropZone.allowStretching()));
+    process.nextTick(() => this.dropzones.forEach((dropzone) => dropzone.allowStretching()));
   };
 
   /**
@@ -79,123 +79,123 @@ class DndController {
 
     if (!!this.finalReposition.from && !!this.finalReposition.to) {
       this.onFinalItemsReposition(
-        this.finalReposition.from.dropZone.id,
+        this.finalReposition.from.dropzone.id,
         this.finalReposition.from.index,
-        this.finalReposition.to.dropZone.id,
+        this.finalReposition.to.dropzone.id,
         this.finalReposition.to.index
       );
     }
 
     this.finalReposition = {};
-    this.latestHoveredDropZone = null;
+    this.latestHoveredDropzone = null;
   };
 
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
 
-  isDraggingOverEmptyDropZone = (dropZone: DropZone, e: MouseEvent) => {
-    const isDropZoneEmpty = !dropZone.items.length;
+  isDraggingOverEmptyDropzone = (dropzone: Dropzone, e: MouseEvent) => {
+    const isDropzoneEmpty = !dropzone.items.length;
     const isCursorInsideDropzone =
-      e.clientX > dropZone.container.getBoundingClientRect().x &&
-      e.clientX < dropZone.container.getBoundingClientRect().right &&
-      e.clientY > dropZone.container.getBoundingClientRect().y &&
-      e.clientY < dropZone.container.getBoundingClientRect().bottom;
+      e.clientX > dropzone.container.getBoundingClientRect().x &&
+      e.clientX < dropzone.container.getBoundingClientRect().right &&
+      e.clientY > dropzone.container.getBoundingClientRect().y &&
+      e.clientY < dropzone.container.getBoundingClientRect().bottom;
 
-    return isDropZoneEmpty && isCursorInsideDropzone;
+    return isDropzoneEmpty && isCursorInsideDropzone;
   };
 
-  placeDraggedItemInNewDropZone = (newDropZone: DropZone, item: DropItem, index = 0) => {
-    this.latestHoveredDropZone?.dropZone.removeItemAt(this.latestHoveredDropZone.index);
+  placeDraggedItemInNewDropzone = (newDropzone: Dropzone, item: DropItem, index = 0) => {
+    this.latestHoveredDropzone?.dropzone.removeItemAt(this.latestHoveredDropzone.index);
 
-    newDropZone.insertItemAt(index, item);
-    item.updateDropZone(newDropZone);
+    newDropzone.insertItemAt(index, item);
+    item.updateDropzone(newDropzone);
 
-    this.finalReposition.to = { dropZone: newDropZone, index };
-    this.latestHoveredDropZone = { dropZone: newDropZone, index };
+    this.finalReposition.to = { dropzone: newDropzone, index };
+    this.latestHoveredDropzone = { dropzone: newDropzone, index };
 
     this.repositionItems();
   };
 
-  handlePositionSwitchInsideDropZone = (dropZone: DropZone, from: number, to: number) => {
-    dropZone.switchItemPosition(from, to);
+  handlePositionSwitchInsideDropzone = (dropzone: Dropzone, from: number, to: number) => {
+    dropzone.switchItemPosition(from, to);
 
-    this.finalReposition.to = { dropZone, index: to };
-    this.latestHoveredDropZone = { dropZone, index: to };
+    this.finalReposition.to = { dropzone, index: to };
+    this.latestHoveredDropzone = { dropzone, index: to };
 
     this.repositionItems();
   };
 
   handleContextWrapperMouseMove = (e: MouseEvent) => {
-    this.dropZones.forEach((dropZone) => {
+    this.dropzones.forEach((dropzone) => {
       if (!this.draggedItem) return;
 
-      if (this.isDraggingOverEmptyDropZone(dropZone, e)) {
-        this.placeDraggedItemInNewDropZone(dropZone, this.draggedItem);
+      if (this.isDraggingOverEmptyDropzone(dropzone, e)) {
+        this.placeDraggedItemInNewDropzone(dropzone, this.draggedItem);
         return;
       }
 
-      dropZone.items.forEach((item, itemIndex) => {
+      dropzone.items.forEach((item, itemIndex) => {
         if (!this.draggedItem || this.draggedItem === item) return;
 
         const isItemHovered = item.isHovered(e);
         const isHoveringFreeSpaceNearItem =
-          dropZone.items[itemIndex + 1]?.rect().y !== item.rect().y && item.hoveringNear(e);
-        const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
+          dropzone.items[itemIndex + 1]?.rect().y !== item.rect().y && item.hoveringNear(e);
+        const draggedItemIndexInDropzone = dropzone.indexOfItem(this.draggedItem);
 
         if (isItemHovered) {
-          this.handleItemHovered(dropZone, draggedItemIndexInDropZone, item, itemIndex, e);
+          this.handleItemHovered(dropzone, draggedItemIndexInDropzone, item, itemIndex, e);
         } else if (isHoveringFreeSpaceNearItem) {
-          this.handleHoveredNearItem(dropZone, itemIndex);
+          this.handleHoveredNearItem(dropzone, itemIndex);
         }
       });
     });
   };
 
   handleItemHovered = (
-    dropZone: DropZone,
-    draggedItemIndexInDropZone: number,
+    dropzone: Dropzone,
+    draggedItemIndexInDropzone: number,
     hoveredItem: DropItem,
     hoveredItemIndex: number,
     e: MouseEvent
   ) => {
     if (!this.draggedItem) return;
 
-    if (draggedItemIndexInDropZone === -1) {
+    if (draggedItemIndexInDropzone === -1) {
       const indexForDraggedItem =
         hoveredItemIndex + (hoveredItem.isLeftSideHovered(e) ? 0 : 1);
 
-      this.placeDraggedItemInNewDropZone(dropZone, this.draggedItem, indexForDraggedItem);
+      this.placeDraggedItemInNewDropzone(dropzone, this.draggedItem, indexForDraggedItem);
     } else {
       const isLeftSideHovered = hoveredItem.isLeftSideHovered(e);
-      const directionLeft = draggedItemIndexInDropZone > hoveredItemIndex;
+      const directionLeft = draggedItemIndexInDropzone > hoveredItemIndex;
       let pp: number;
       if (isLeftSideHovered && !directionLeft) pp = hoveredItemIndex - 1;
       else if (isLeftSideHovered && directionLeft) pp = hoveredItemIndex;
       else if (!isLeftSideHovered && !directionLeft) pp = hoveredItemIndex;
       else pp = hoveredItemIndex + 1;
       const potentialNewPosition = pp;
-      if (potentialNewPosition !== draggedItemIndexInDropZone) {
-        this.handlePositionSwitchInsideDropZone(
-          dropZone,
-          draggedItemIndexInDropZone,
+      if (potentialNewPosition !== draggedItemIndexInDropzone) {
+        this.handlePositionSwitchInsideDropzone(
+          dropzone,
+          draggedItemIndexInDropzone,
           Math.max(0, potentialNewPosition)
         );
       }
     }
   };
 
-  handleHoveredNearItem = (dropZone: DropZone, itemIndex: number) => {
+  handleHoveredNearItem = (dropzone: Dropzone, itemIndex: number) => {
     if (!this.draggedItem) return;
 
-    const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
+    const draggedItemIndexInDropzone = dropzone.indexOfItem(this.draggedItem);
 
-    if (draggedItemIndexInDropZone === -1) {
-      this.placeDraggedItemInNewDropZone(dropZone, this.draggedItem, itemIndex + 1);
+    if (draggedItemIndexInDropzone === -1) {
+      this.placeDraggedItemInNewDropzone(dropzone, this.draggedItem, itemIndex + 1);
     } else {
-      const directionLeft = draggedItemIndexInDropZone > itemIndex;
+      const directionLeft = draggedItemIndexInDropzone > itemIndex;
 
-      this.handlePositionSwitchInsideDropZone(
-        dropZone,
-        draggedItemIndexInDropZone,
+      this.handlePositionSwitchInsideDropzone(
+        dropzone,
+        draggedItemIndexInDropzone,
         itemIndex + (directionLeft ? 1 : 0)
       );
     }
@@ -212,17 +212,17 @@ class DndController {
   };
 
   /**
-   * Recursively check all context children and build DropZone and DropItem objects.
+   * Recursively check all context children and build Dropzone and DropItem objects.
    */
   prepareDropzonesAndItems = () => {
-    this.dropZones = this.collectDropzones(this.contextWrapper);
+    this.dropzones = this.collectDropzones(this.contextWrapper);
 
-    for (let i = 0; i < this.dropZones.length; i++) {
-      const dropZone = this.dropZones[i];
+    for (let i = 0; i < this.dropzones.length; i++) {
+      const dropzone = this.dropzones[i];
 
-      if (!dropZone.container.style.minHeight) dropZone.container.style.minHeight = "30px";
+      if (!dropzone.container.style.minHeight) dropzone.container.style.minHeight = "30px";
 
-      dropZone.items.forEach((item) => {
+      dropzone.items.forEach((item) => {
         item.self.style.position = "absolute";
 
         item.self.onmousedown = (e) => {
@@ -231,12 +231,12 @@ class DndController {
           item.applyMouseDownStyle(e);
           this.draggedItem = item;
           this.finalReposition.from = {
-            dropZone: item.dropZone,
-            index: item.dropZone.items.lastIndexOf(item),
+            dropzone: item.dropzone,
+            index: item.dropzone.items.lastIndexOf(item),
           };
-          this.latestHoveredDropZone = {
-            dropZone: item.dropZone,
-            index: item.dropZone.items.lastIndexOf(item),
+          this.latestHoveredDropzone = {
+            dropzone: item.dropzone,
+            index: item.dropzone.items.lastIndexOf(item),
           };
         };
       });
@@ -244,11 +244,11 @@ class DndController {
   };
 
   collectDropzones = (container: HTMLElement) => {
-    const dropzones: DropZone[] = [];
+    const dropzones: Dropzone[] = [];
 
     container.children.array().forEach((child) => {
       if (hasBrickwallId(child)) {
-        dropzones.push(new DropZone(child));
+        dropzones.push(new Dropzone(child));
       } else {
         dropzones.push(...this.collectDropzones(child));
       }
@@ -258,14 +258,14 @@ class DndController {
   };
 
   repositionItems = (animated: boolean = true) => {
-    this.dropZones.forEach((dropZone) => {
-      const maxWidth = dropZone.container.clientWidth;
+    this.dropzones.forEach((dropzone) => {
+      const maxWidth = dropzone.container.clientWidth;
 
       let xOffset = this.gridGap;
       let yOffset = this.gridGap;
-      let resultingContainerHeight = parseInt(dropZone.container.style.minHeight);
+      let resultingContainerHeight = parseInt(dropzone.container.style.minHeight);
 
-      dropZone.items.forEach((item) => {
+      dropzone.items.forEach((item) => {
         // Decide if we want to render this item near left edge and below current row
         if (xOffset + item.getFullWidth() + this.gridGap > maxWidth) {
           xOffset = this.gridGap;
@@ -276,7 +276,7 @@ class DndController {
         item.animateIf(item !== this.draggedItem && animated);
 
         // TODO - not sure what this line does to dragged item
-        item.landInDropZone({ xOffset, yOffset });
+        item.landInDropzone({ xOffset, yOffset });
 
         // Get horizonral offset for next item
         xOffset += item.getFullWidth() + this.gridGap;
@@ -287,7 +287,7 @@ class DndController {
       });
 
       // Actually extend container height
-      dropZone.container.style.height = `${resultingContainerHeight}px`;
+      dropzone.container.style.height = `${resultingContainerHeight}px`;
     });
   };
 }

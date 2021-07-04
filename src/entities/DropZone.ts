@@ -4,7 +4,7 @@ const makeArayOfElements = (collection: HTMLCollection) => [
   ...(collection as unknown as HTMLElement[]),
 ];
 
-export class DropZone {
+export class Dropzone {
   container: HTMLElement;
   items: DropItem[]; // TODO - make properties private
 
@@ -25,7 +25,7 @@ export class DropZone {
 
   insertItemAt = (index: number, item: DropItem) => {
     this.items.splice(index, 0, item);
-    item.updateDropZone(this);
+    item.updateDropzone(this);
   };
 
   removeItemAt = (index: number) => this.items.splice(index, 1);
@@ -34,4 +34,4 @@ export class DropZone {
     this.insertItemAt(to, this.removeItemAt(from)[0]);
 }
 
-export default DropZone;
+export default Dropzone;

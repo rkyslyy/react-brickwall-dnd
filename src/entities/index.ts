@@ -1,5 +1,5 @@
 import DndController from "./DndController";
 import DropItem from "./DropItem";
-import DropZone from "./DropZone";
+import Dropzone from "./Dropzone";
 
-export { DndController, DropItem, DropZone };
+export { DndController, DropItem, Dropzone };

@@ -1,4 +1,4 @@
-import { DropZone } from "../../entities";
+import { Dropzone } from "../../entities";
 
 export type OnChildRepositionCallback = (
   fromId: string,
@@ -15,7 +15,7 @@ export interface BrickwallProps {
 }
 
 export interface DraggedItemSource {
-  dropZone: DropZone;
+  dropzone: Dropzone;
   index: number;
 }
 

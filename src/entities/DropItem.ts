@@ -1,4 +1,4 @@
-import { DropZone } from "./DropZone";
+import { Dropzone } from "./Dropzone";
 
 export interface Offset {
   xOffset: number;
@@ -6,11 +6,11 @@ export interface Offset {
 }
 
 export class DropItem {
-  dropZone: DropZone;
+  dropzone: Dropzone;
   self: HTMLElement;
 
-  constructor(dropZone: DropZone, element: HTMLElement) {
-    this.dropZone = dropZone;
+  constructor(dropzone: Dropzone, element: HTMLElement) {
+    this.dropzone = dropzone;
     this.self = element;
   }
 
@@ -29,9 +29,9 @@ export class DropItem {
 
     return (
       clientX > right &&
-      clientX < this.dropZone.container.getBoundingClientRect().right &&
+      clientX < this.dropzone.container.getBoundingClientRect().right &&
       clientY > y &&
-      clientY < this.dropZone.container.getBoundingClientRect().bottom
+      clientY < this.dropzone.container.getBoundingClientRect().bottom
     );
   };
 
@@ -50,27 +50,27 @@ export class DropItem {
     (parseInt(this.self.style.borderLeft || "0") +
       parseInt(this.self.style.borderRight || "0"));
 
-  getCurrentDropZone = () => this.dropZone;
+  getCurrentDropzone = () => this.dropzone;
 
   getRealParent = () => this.self.parentElement;
 
   getRealParentOffset = (): Offset => {
     return {
       xOffset:
-        this.dropZone.container.getBoundingClientRect().x -
+        this.dropzone.container.getBoundingClientRect().x -
         (this.getRealParent()?.getBoundingClientRect().x || 0),
       yOffset:
-        this.dropZone.container.getBoundingClientRect().y -
+        this.dropzone.container.getBoundingClientRect().y -
         (this.getRealParent()?.getBoundingClientRect().y || 0),
     };
   };
 
-  getPositionInDropZone = (dropZone: DropZone) => dropZone.items.indexOf(this);
+  getPositionInDropzone = (dropzone: Dropzone) => dropzone.items.indexOf(this);
 
-  landInDropZone = (dropZoneOffset: Offset) => {
+  landInDropzone = (dropzoneOffset: Offset) => {
     const realParentOffset = this.getRealParentOffset();
-    this.self.style.marginLeft = `${dropZoneOffset.xOffset + realParentOffset.xOffset}px`;
-    this.self.style.marginTop = `${dropZoneOffset.yOffset + realParentOffset.yOffset}px`;
+    this.self.style.marginLeft = `${dropzoneOffset.xOffset + realParentOffset.xOffset}px`;
+    this.self.style.marginTop = `${dropzoneOffset.yOffset + realParentOffset.yOffset}px`;
     this.self.style.cursor = "grab";
   };
 
@@ -79,20 +79,20 @@ export class DropItem {
     this.self.style.marginLeft = `${
       event.clientX -
       this.self.clientWidth / 2 -
-      this.dropZone.container.getBoundingClientRect().x +
+      this.dropzone.container.getBoundingClientRect().x +
       xOffset
     }px`;
     this.self.style.marginTop = `${
       event.clientY -
       this.self.clientHeight / 2 -
-      this.dropZone.container.getBoundingClientRect().y +
+      this.dropzone.container.getBoundingClientRect().y +
       yOffset
     }px`;
   };
 
   rect = () => this.self.getBoundingClientRect();
 
-  updateDropZone = (newDropZone: DropZone) => (this.dropZone = newDropZone);
+  updateDropzone = (newDropzone: Dropzone) => (this.dropzone = newDropzone);
 }
 
 export default DropItem;
