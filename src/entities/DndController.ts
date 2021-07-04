@@ -140,10 +140,9 @@ class DndController {
         const isItemHovered = item.isHovered(e);
         const isHoveringFreeSpaceNearItem =
           dropZone.items[itemIndex + 1]?.rect().y !== item.rect().y && item.hoveringNear(e);
+        const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
 
         if (isItemHovered) {
-          const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
-
           // Dragged item is from another dropzone
           if (draggedItemIndexInDropZone === -1) {
             const indexForDraggedItem = itemIndex + (item.isLeftSideHovered(e) ? 0 : 1);
@@ -192,6 +191,39 @@ class DndController {
         }
       });
     });
+  };
+
+  handleItemHovered = (
+    dropZone: DropZone,
+    draggedItemIndexInDropZone: number,
+    hoveredItem: DropItem,
+    hoveredItemIndex: number,
+    e: MouseEvent
+  ) => {
+    if (!this.draggedItem) return;
+
+    if (draggedItemIndexInDropZone === -1) {
+      const indexForDraggedItem =
+        hoveredItemIndex + (hoveredItem.isLeftSideHovered(e) ? 0 : 1);
+
+      this.placeDraggedItemInNewDropZone(dropZone, this.draggedItem, indexForDraggedItem);
+    } else {
+      const isLeftSideHovered = hoveredItem.isLeftSideHovered(e);
+      const directionLeft = draggedItemIndexInDropZone > hoveredItemIndex;
+      let pp: number;
+      if (isLeftSideHovered && !directionLeft) pp = hoveredItemIndex - 1;
+      else if (isLeftSideHovered && directionLeft) pp = hoveredItemIndex;
+      else if (!isLeftSideHovered && !directionLeft) pp = hoveredItemIndex;
+      else pp = hoveredItemIndex + 1;
+      const potentialNewPosition = pp;
+      if (potentialNewPosition !== draggedItemIndexInDropZone) {
+        this.handlePositionSwitchInsideDropZone(
+          dropZone,
+          draggedItemIndexInDropZone,
+          Math.max(0, potentialNewPosition)
+        );
+      }
+    }
   };
 
   /**
