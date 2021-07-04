@@ -11,7 +11,7 @@ import { wait } from "../utils/wait";
 interface DndControllerOptions {
   animationSpeed: number;
   gridGap: number;
-  onFinalItemsReposition: OnChildRepositionCallback;
+  onItemsReposition: OnChildRepositionCallback;
 }
 
 class DndController {
@@ -22,15 +22,15 @@ class DndController {
 
   animationSpeed: number;
   gridGap: number;
-  onFinalItemsReposition: OnChildRepositionCallback;
+  onItemsReposition: OnChildRepositionCallback;
 
   initialItemGrabLocation: Location | null;
   grabbedItemCurrentLocation: Location | null;
 
-  constructor({ animationSpeed, gridGap, onFinalItemsReposition }: DndControllerOptions) {
+  constructor({ animationSpeed, gridGap, onItemsReposition }: DndControllerOptions) {
     this.animationSpeed = animationSpeed;
     this.gridGap = gridGap;
-    this.onFinalItemsReposition = onFinalItemsReposition;
+    this.onItemsReposition = onItemsReposition;
   }
 
   setup = (contextWrapper: HTMLElement | null) => {
@@ -79,7 +79,7 @@ class DndController {
     await wait(this.animationSpeed); // to not interrupt final animation
 
     if (!!this.initialItemGrabLocation && !!this.grabbedItemCurrentLocation) {
-      this.onFinalItemsReposition(
+      this.onItemsReposition(
         this.initialItemGrabLocation.dropzone.id,
         this.initialItemGrabLocation.index,
         this.grabbedItemCurrentLocation.dropzone.id,
@@ -89,6 +89,14 @@ class DndController {
 
     this.initialItemGrabLocation = null;
     this.grabbedItemCurrentLocation = null;
+  };
+
+  /**
+   * Called when <Brickwall /> children have changed to update each dropzone's items.
+   */
+  rebuildDropzones = () => {
+    this.prepareDropzonesAndItems();
+    this.repositionItems(false);
   };
 
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);

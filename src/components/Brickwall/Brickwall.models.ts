@@ -11,7 +11,7 @@ export interface BrickwallProps {
   animationSpeed?: number;
   gridGap?: number;
   wrapperClassname?: string;
-  onChildrenReposition: OnChildRepositionCallback;
+  onItemsReposition: OnChildRepositionCallback;
 }
 
 export interface DraggedItemSource {

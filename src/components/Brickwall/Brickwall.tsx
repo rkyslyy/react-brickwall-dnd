@@ -9,21 +9,18 @@ const Brickwall: React.FC<BrickwallProps> = ({
   animationSpeed = DEFAULT_ANIMATION_SPEED,
   children,
   gridGap = 0,
-  onChildrenReposition,
+  onItemsReposition,
   wrapperClassname,
 }) => {
   const dndController = React.useRef(
     new DndController({
       animationSpeed,
       gridGap,
-      onFinalItemsReposition: onChildrenReposition,
+      onItemsReposition,
     })
   );
 
-  React.useEffect(() => {
-    dndController.current.prepareDropzonesAndItems();
-    dndController.current.repositionItems(false);
-  }, [children]);
+  React.useEffect(() => dndController.current.rebuildDropzones(), [children]);
 
   return (
     <div className={wrapperClassname} ref={dndController.current.setup}>
