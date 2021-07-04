@@ -1,4 +1,7 @@
-import { OnChildRepositionCallback } from "./../components/Brickwall/Brickwall.models";
+import {
+  Location,
+  OnChildRepositionCallback,
+} from "./../components/Brickwall/Brickwall.models";
 import { FinalReposition, DraggedItemSource } from "../components/Brickwall/Brickwall.models";
 import { hasBrickwallId } from "../utils/hasBrickwallId";
 
@@ -221,7 +224,7 @@ class DndController {
 
       if (!dropzone.container.style.minHeight) dropzone.container.style.minHeight = "30px";
 
-      dropzone.items.forEach((item) => {
+      dropzone.items.forEach((item, index) => {
         item.self.style.position = "absolute";
 
         item.self.onmousedown = (e) => {
@@ -231,11 +234,11 @@ class DndController {
           this.draggedItem = item;
           this.finalReposition.from = {
             dropzone: item.dropzone,
-            index: item.dropzone.items.lastIndexOf(item),
+            index,
           };
           this.latestHoveredDropzone = {
             dropzone: item.dropzone,
-            index: item.dropzone.items.lastIndexOf(item),
+            index,
           };
         };
       });
@@ -274,8 +277,7 @@ class DndController {
         // Dragged item should change location without transition effect
         item.animateIf(item !== this.draggedItem && animated);
 
-        // TODO - not sure what this line does to dragged item
-        item.landInDropzone({ xOffset, yOffset });
+        item.placeInDropzone({ xOffset, yOffset });
 
         // Get horizonral offset for next item
         xOffset += item.getFullWidth() + this.gridGap;

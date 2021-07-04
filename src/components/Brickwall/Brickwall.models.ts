@@ -23,3 +23,8 @@ export interface FinalReposition {
   from?: DraggedItemSource;
   to?: DraggedItemSource;
 }
+
+export interface Location {
+  dropzone: Dropzone;
+  index: number;
+}

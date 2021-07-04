@@ -67,7 +67,7 @@ export class Item {
 
   getPositionInDropzone = (dropzone: Dropzone) => dropzone.items.indexOf(this);
 
-  landInDropzone = (dropzoneOffset: Offset) => {
+  placeInDropzone = (dropzoneOffset: Offset) => {
     const realParentOffset = this.getRealParentOffset();
     this.self.style.marginLeft = `${dropzoneOffset.xOffset + realParentOffset.xOffset}px`;
     this.self.style.marginTop = `${dropzoneOffset.yOffset + realParentOffset.yOffset}px`;
