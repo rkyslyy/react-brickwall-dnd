@@ -4,7 +4,7 @@ import {
 } from "./../components/Brickwall/Brickwall.models";
 import { hasBrickwallId } from "../utils/hasBrickwallId";
 
-import Item from "./DropItem";
+import Item from "./Item";
 import Dropzone from "./Dropzone";
 import { wait } from "../utils/wait";
 
@@ -18,14 +18,13 @@ class DndController {
   contextWrapper: HTMLElement;
 
   dropzones: Dropzone[] = [];
-  dropItems: Item[] = [];
   draggedItem: Item | null = null;
 
   animationSpeed: number;
   gridGap: number;
   onFinalItemsReposition: OnChildRepositionCallback;
 
-  itemGrabLocation: Location | null;
+  initialItemGrabLocation: Location | null;
   grabbedItemCurrentLocation: Location | null;
 
   constructor({ animationSpeed, gridGap, onFinalItemsReposition }: DndControllerOptions) {
@@ -70,25 +69,23 @@ class DndController {
   clearDraggedItem = async () => {
     if (!this.draggedItem) return;
 
-    this.draggedItem.self.style.zIndex = "1";
-    this.draggedItem.self.style.transition = "all .15s ease";
-    this.draggedItem.self.style.cursor = "grab";
+    this.draggedItem.applyDefaultStyle(this.animationSpeed);
     this.draggedItem = null;
 
     this.repositionItems();
 
     await wait(this.animationSpeed); // to not interrupt final animation
 
-    if (!!this.itemGrabLocation && !!this.grabbedItemCurrentLocation) {
+    if (!!this.initialItemGrabLocation && !!this.grabbedItemCurrentLocation) {
       this.onFinalItemsReposition(
-        this.itemGrabLocation.dropzone.id,
-        this.itemGrabLocation.index,
+        this.initialItemGrabLocation.dropzone.id,
+        this.initialItemGrabLocation.index,
         this.grabbedItemCurrentLocation.dropzone.id,
         this.grabbedItemCurrentLocation.index
       );
     }
 
-    this.itemGrabLocation = null;
+    this.initialItemGrabLocation = null;
     this.grabbedItemCurrentLocation = null;
   };
 
@@ -118,7 +115,7 @@ class DndController {
     this.repositionItems();
   };
 
-  handlePositionSwitchInsideDropzone = (dropzone: Dropzone, from: number, to: number) => {
+  handleIndexSwitchInsideDropzone = (dropzone: Dropzone, from: number, to: number) => {
     dropzone.switchItemPosition(from, to);
 
     this.grabbedItemCurrentLocation = { dropzone, index: to };
@@ -126,10 +123,14 @@ class DndController {
     this.repositionItems();
   };
 
+  /**
+   * Loop over each dropzone's items and check whether any of them
+   * are hovered by dragged item to trigger reposition
+   */
   handleContextWrapperMouseMove = (e: MouseEvent) => {
-    this.dropzones.forEach((dropzone) => {
-      if (!this.draggedItem) return;
+    if (!this.draggedItem) return;
 
+    for (const dropzone of this.dropzones) {
       if (this.isDraggingOverEmptyDropzone(dropzone, e)) {
         this.placeDraggedItemInNewDropzone(dropzone, this.draggedItem);
         return;
@@ -148,7 +149,7 @@ class DndController {
           this.handleHoveredNearItem(dropzone, itemIndex);
         }
       });
-    });
+    }
   };
 
   handleItemHovered = (
@@ -167,21 +168,35 @@ class DndController {
       this.placeDraggedItemInNewDropzone(dropzone, this.draggedItem, indexForDraggedItem);
     } else {
       const isLeftSideHovered = hoveredItem.isLeftSideHovered(e);
-      const directionLeft = draggedItemIndexInDropzone > hoveredItemIndex;
-      let pp: number;
-      if (isLeftSideHovered && !directionLeft) pp = hoveredItemIndex - 1;
-      else if (isLeftSideHovered && directionLeft) pp = hoveredItemIndex;
-      else if (!isLeftSideHovered && !directionLeft) pp = hoveredItemIndex;
-      else pp = hoveredItemIndex + 1;
-      const potentialNewPosition = pp;
-      if (potentialNewPosition !== draggedItemIndexInDropzone) {
-        this.handlePositionSwitchInsideDropzone(
+      const isDirectionLeft = draggedItemIndexInDropzone > hoveredItemIndex;
+      const draggedItemIndexAfterSwitch = Math.max(
+        0,
+        this.getDraggedItemIndexAfterSwitch(
+          isLeftSideHovered,
+          isDirectionLeft,
+          hoveredItemIndex
+        )
+      );
+
+      if (draggedItemIndexAfterSwitch !== draggedItemIndexInDropzone) {
+        this.handleIndexSwitchInsideDropzone(
           dropzone,
           draggedItemIndexInDropzone,
-          Math.max(0, potentialNewPosition)
+          draggedItemIndexAfterSwitch
         );
       }
     }
+  };
+
+  getDraggedItemIndexAfterSwitch = (
+    isLeftSideHovered: boolean,
+    isDirectionLeft: boolean,
+    hoveredItemIndex: number
+  ) => {
+    if (isLeftSideHovered && !isDirectionLeft) return hoveredItemIndex - 1;
+    else if (!isLeftSideHovered && isDirectionLeft) return hoveredItemIndex + 1;
+
+    return hoveredItemIndex;
   };
 
   handleHoveredNearItem = (dropzone: Dropzone, itemIndex: number) => {
@@ -194,7 +209,7 @@ class DndController {
     } else {
       const directionLeft = draggedItemIndexInDropzone > itemIndex;
 
-      this.handlePositionSwitchInsideDropzone(
+      this.handleIndexSwitchInsideDropzone(
         dropzone,
         draggedItemIndexInDropzone,
         itemIndex + (directionLeft ? 1 : 0)
@@ -207,8 +222,10 @@ class DndController {
    */
   prepareContextWrapper = (contextWrapper: HTMLElement) => {
     this.contextWrapper = contextWrapper;
+
     contextWrapper.style.display = "flex";
     contextWrapper.style.position = "relative";
+
     contextWrapper.onmousemove = this.handleContextWrapperMouseMove;
   };
 
@@ -218,12 +235,10 @@ class DndController {
   prepareDropzonesAndItems = () => {
     this.dropzones = this.collectDropzones(this.contextWrapper);
 
-    for (let i = 0; i < this.dropzones.length; i++) {
-      const dropzone = this.dropzones[i];
-
+    for (const dropzone of this.dropzones) {
       if (!dropzone.container.style.minHeight) dropzone.container.style.minHeight = "30px";
 
-      dropzone.items.forEach((item, index) => {
+      dropzone.items.forEach((item) => {
         item.self.style.position = "absolute";
 
         item.self.onmousedown = (e) => {
@@ -231,7 +246,10 @@ class DndController {
 
           item.applyMouseDownStyle(e);
           this.draggedItem = item;
-          this.grabbedItemCurrentLocation = { dropzone: item.dropzone, index };
+          this.grabbedItemCurrentLocation = {
+            dropzone: item.dropzone,
+            index: item.dropzone.items.lastIndexOf(item),
+          };
         };
       });
     }
@@ -279,7 +297,7 @@ class DndController {
           resultingContainerHeight = yOffset + item.rect().height + this.gridGap;
       });
 
-      // Actually extend container height
+      // Extend container height
       dropzone.container.style.height = `${resultingContainerHeight}px`;
     });
   };

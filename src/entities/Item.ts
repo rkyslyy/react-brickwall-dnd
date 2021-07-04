@@ -21,7 +21,14 @@ export class Item {
     this.self.style.cursor = "grabbing";
     this.self.style.transition = "";
     this.self.style.zIndex = "9999";
+
     this.move(event);
+  };
+
+  applyDefaultStyle = (animationSpeed: number) => {
+    this.self.style.zIndex = "1";
+    this.self.style.transition = `all .${animationSpeed}s ease`;
+    this.self.style.cursor = "grab";
   };
 
   hoveringNear = ({ clientX, clientY }: MouseEvent) => {
