@@ -103,7 +103,6 @@ class DndController {
     return isDropZoneEmpty && isCursorInsideDropzone;
   };
 
-  // TODO - rename "drop" to something else
   placeDraggedItemInNewDropZone = (newDropZone: DropZone, item: DropItem, index = 0) => {
     this.latestHoveredDropZone?.dropZone.removeItemAt(this.latestHoveredDropZone.index);
 
@@ -204,7 +203,6 @@ class DndController {
 
   /**
    * Setup all positioning calculations.
-   * TODO - refactor this horrible mess
    */
   prepareContextWrapper = (contextWrapper: HTMLElement) => {
     this.contextWrapper = contextWrapper;
@@ -217,7 +215,6 @@ class DndController {
    * Recursively check all context children and build DropZone and DropItem objects.
    */
   prepareDropzonesAndItems = () => {
-    // TODO - move collectDropzones from utils to this class
     this.dropZones = this.collectDropzones(this.contextWrapper);
 
     for (let i = 0; i < this.dropZones.length; i++) {
