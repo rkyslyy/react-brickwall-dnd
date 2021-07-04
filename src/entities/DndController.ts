@@ -255,6 +255,9 @@ class DndController {
     }
   };
 
+  /**
+   * Recursively find all elements with id that starts with "bw-dz".
+   */
   collectDropzones = (container: HTMLElement) => {
     const dropzones: Dropzone[] = [];
 
@@ -269,6 +272,10 @@ class DndController {
     return dropzones;
   };
 
+  /**
+   * Loop over all items in dropzones and place them based on previous item's
+   * position in dropzone.
+   */
   repositionItems = (animated: boolean = true) => {
     this.dropzones.forEach((dropzone) => {
       const maxWidth = dropzone.container.clientWidth;
