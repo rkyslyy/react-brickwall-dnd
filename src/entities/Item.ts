@@ -7,28 +7,29 @@ export interface Offset {
 
 export class Item {
   dropzone: Dropzone;
-  self: HTMLElement;
+  itemElement: HTMLElement;
 
   constructor(dropzone: Dropzone, element: HTMLElement) {
     this.dropzone = dropzone;
-    this.self = element;
+    this.itemElement = element;
   }
 
-  animateIf = (condition: boolean) =>
-    (this.self.style.transition = condition ? "all .15s ease" : "");
+  toggleAnimation = (enabled: boolean, animationSpeed: number) => {
+    this.itemElement.style.transition = enabled ? `all .${animationSpeed}s ease` : "";
+  };
 
   applyMouseDownStyle = (event: MouseEvent) => {
-    this.self.style.cursor = "grabbing";
-    this.self.style.transition = "";
-    this.self.style.zIndex = "9999";
+    this.itemElement.style.cursor = "grabbing";
+    this.itemElement.style.transition = "";
+    this.itemElement.style.zIndex = "9999";
 
     this.move(event);
   };
 
   applyDefaultStyle = (animationSpeed: number) => {
-    this.self.style.zIndex = "1";
-    this.self.style.transition = `all .${animationSpeed}s ease`;
-    this.self.style.cursor = "grab";
+    this.itemElement.style.zIndex = "1";
+    this.itemElement.style.cursor = "grab";
+    this.toggleAnimation(true, animationSpeed);
   };
 
   hoveringNear = ({ clientX, clientY }: MouseEvent) => {
@@ -53,13 +54,13 @@ export class Item {
   };
 
   getFullWidth = () =>
-    this.self.scrollWidth +
-    (parseInt(this.self.style.borderLeft || "0") +
-      parseInt(this.self.style.borderRight || "0"));
+    this.itemElement.scrollWidth +
+    (parseInt(this.itemElement.style.borderLeft || "0") +
+      parseInt(this.itemElement.style.borderRight || "0"));
 
   getCurrentDropzone = () => this.dropzone;
 
-  getRealParent = () => this.self.parentElement;
+  getRealParent = () => this.itemElement.parentElement;
 
   getRealParentOffset = (): Offset => {
     return {
@@ -76,28 +77,32 @@ export class Item {
 
   placeInDropzone = (dropzoneOffset: Offset) => {
     const realParentOffset = this.getRealParentOffset();
-    this.self.style.marginLeft = `${dropzoneOffset.xOffset + realParentOffset.xOffset}px`;
-    this.self.style.marginTop = `${dropzoneOffset.yOffset + realParentOffset.yOffset}px`;
-    this.self.style.cursor = "grab";
+    this.itemElement.style.marginLeft = `${
+      dropzoneOffset.xOffset + realParentOffset.xOffset
+    }px`;
+    this.itemElement.style.marginTop = `${
+      dropzoneOffset.yOffset + realParentOffset.yOffset
+    }px`;
+    this.itemElement.style.cursor = "grab";
   };
 
   move = (event: MouseEvent) => {
     const { xOffset, yOffset } = this.getRealParentOffset();
-    this.self.style.marginLeft = `${
+    this.itemElement.style.marginLeft = `${
       event.clientX -
-      this.self.clientWidth / 2 -
+      this.itemElement.clientWidth / 2 -
       this.dropzone.container.getBoundingClientRect().x +
       xOffset
     }px`;
-    this.self.style.marginTop = `${
+    this.itemElement.style.marginTop = `${
       event.clientY -
-      this.self.clientHeight / 2 -
+      this.itemElement.clientHeight / 2 -
       this.dropzone.container.getBoundingClientRect().y +
       yOffset
     }px`;
   };
 
-  rect = () => this.self.getBoundingClientRect();
+  rect = () => this.itemElement.getBoundingClientRect();
 
   updateDropzone = (newDropzone: Dropzone) => (this.dropzone = newDropzone);
 }

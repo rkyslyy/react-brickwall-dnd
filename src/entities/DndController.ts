@@ -239,9 +239,9 @@ class DndController {
       if (!dropzone.container.style.minHeight) dropzone.container.style.minHeight = "30px";
 
       dropzone.items.forEach((item) => {
-        item.self.style.position = "absolute";
+        item.itemElement.style.position = "absolute";
 
-        item.self.onmousedown = (e) => {
+        item.itemElement.onmousedown = (e) => {
           if (this.draggedItem) return;
 
           item.applyMouseDownStyle(e);
@@ -285,7 +285,8 @@ class DndController {
         }
 
         // Dragged item should change location without transition effect
-        item.animateIf(item !== this.draggedItem && animated);
+        const shouldAnimateRepositioning = animated && item !== this.draggedItem;
+        item.toggleAnimation(shouldAnimateRepositioning, this.animationSpeed);
 
         item.placeInDropzone({ xOffset, yOffset });
 
