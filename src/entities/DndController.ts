@@ -143,51 +143,9 @@ class DndController {
         const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
 
         if (isItemHovered) {
-          // Dragged item is from another dropzone
-          if (draggedItemIndexInDropZone === -1) {
-            const indexForDraggedItem = itemIndex + (item.isLeftSideHovered(e) ? 0 : 1);
-
-            this.placeDraggedItemInNewDropZone(
-              dropZone,
-              this.draggedItem,
-              indexForDraggedItem
-            );
-
-            // Dragged item is from same dropzone
-          } else {
-            // TODO - too many enters
-            const isLeftSideHovered = item.isLeftSideHovered(e);
-            const directionLeft = draggedItemIndexInDropZone > itemIndex;
-            let pp: number;
-            if (isLeftSideHovered && !directionLeft) pp = itemIndex - 1;
-            else if (isLeftSideHovered && directionLeft) pp = itemIndex;
-            else if (!isLeftSideHovered && !directionLeft) pp = itemIndex;
-            else pp = itemIndex + 1;
-            const potentialNewPosition = pp;
-            if (potentialNewPosition !== draggedItemIndexInDropZone) {
-              this.handlePositionSwitchInsideDropZone(
-                dropZone,
-                draggedItemIndexInDropZone,
-                Math.max(0, potentialNewPosition)
-              );
-            }
-          }
-
-          // Check if next item is on next row and hovering over free space near current item
+          this.handleItemHovered(dropZone, draggedItemIndexInDropZone, item, itemIndex, e);
         } else if (isHoveringFreeSpaceNearItem) {
-          const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
-
-          if (draggedItemIndexInDropZone === -1) {
-            this.placeDraggedItemInNewDropZone(dropZone, this.draggedItem, itemIndex + 1);
-          } else {
-            const directionLeft = draggedItemIndexInDropZone > itemIndex;
-
-            this.handlePositionSwitchInsideDropZone(
-              dropZone,
-              draggedItemIndexInDropZone,
-              directionLeft ? itemIndex + 1 : itemIndex
-            );
-          }
+          this.handleHoveredNearItem(dropZone, itemIndex);
         }
       });
     });
@@ -223,6 +181,24 @@ class DndController {
           Math.max(0, potentialNewPosition)
         );
       }
+    }
+  };
+
+  handleHoveredNearItem = (dropZone: DropZone, itemIndex: number) => {
+    if (!this.draggedItem) return;
+
+    const draggedItemIndexInDropZone = dropZone.indexOfItem(this.draggedItem);
+
+    if (draggedItemIndexInDropZone === -1) {
+      this.placeDraggedItemInNewDropZone(dropZone, this.draggedItem, itemIndex + 1);
+    } else {
+      const directionLeft = draggedItemIndexInDropZone > itemIndex;
+
+      this.handlePositionSwitchInsideDropZone(
+        dropZone,
+        draggedItemIndexInDropZone,
+        itemIndex + (directionLeft ? 1 : 0)
+      );
     }
   };
 
