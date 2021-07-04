@@ -20,6 +20,11 @@ const Brickwall: React.FC<BrickwallProps> = ({
     })
   );
 
+  React.useEffect(() => {
+    dndController.current.prepareDropzonesAndItems();
+    dndController.current.repositionItems(false);
+  }, [children]);
+
   return (
     <div className={wrapperClassname} ref={dndController.current.setup}>
       {children}

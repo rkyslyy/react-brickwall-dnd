@@ -248,7 +248,7 @@ class DndController {
 
           item.applyMouseDownStyle(e);
           this.draggedItem = item;
-          this.grabbedItemCurrentLocation = {
+          this.initialItemGrabLocation = this.grabbedItemCurrentLocation = {
             dropzone: item.dropzone,
             index: item.dropzone.items.lastIndexOf(item),
           };
