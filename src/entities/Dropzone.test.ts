@@ -90,4 +90,25 @@ describe("Dropzone", () => {
       expect(anotherItem.dropzone).toEqual(dropzone);
     });
   });
+
+  describe("switchItemPosition()", () => {
+    it("should correctly switch item positions", () => {
+      const dropzoneElement = document.createElement("div");
+      const child0 = document.createElement("div");
+      const child1 = document.createElement("div");
+      const child2 = document.createElement("div");
+      const dropzoneChildren = [child0, child1, child2];
+
+      dropzoneChildren.forEach((child) => dropzoneElement.appendChild(child));
+
+      const dropzone = new Dropzone(dropzoneElement);
+      const from = 0;
+      const to = 1;
+
+      dropzone.switchItemPosition(from, to);
+
+      expect(dropzone.items[0]).toEqual(child1);
+      expect(dropzone.items[1]).toEqual(child0);
+    });
+  });
 });
