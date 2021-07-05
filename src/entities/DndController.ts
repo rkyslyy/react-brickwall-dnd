@@ -99,12 +99,11 @@ class DndController {
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.moveOnScreen(e);
 
   placeDraggedItemInNewDropzone = (newDropzone: Dropzone, item: Item, index = 0) => {
-    this.grabbedItemCurrentLocation?.dropzone.removeItemAt(
-      this.grabbedItemCurrentLocation.index
-    );
+    // this.grabbedItemCurrentLocation?.dropzone.removeItemAt(
+    //   this.grabbedItemCurrentLocation.index
+    // );
 
     newDropzone.insertItemAt(index, item);
-    item.updateDropzone(newDropzone);
 
     this.grabbedItemCurrentLocation = { dropzone: newDropzone, index };
 

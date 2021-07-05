@@ -64,13 +64,14 @@ describe("Dropzone", () => {
   });
 
   describe("insertItemAt()", () => {
-    it("should correctly insert item at the start of array", () => {
+    it("should insert item at the given index", () => {
       const dropzoneElement = document.createElement("div");
       const dropzoneChildren = [
         document.createElement("div"),
         document.createElement("div"),
         document.createElement("div"),
       ];
+      const index = 1;
 
       dropzoneChildren.forEach((child) => dropzoneElement.appendChild(child));
 
@@ -83,9 +84,9 @@ describe("Dropzone", () => {
 
       expect(anotherItem.dropzone).toEqual(anotherDropzone);
 
-      dropzone.insertItemAt(0, anotherItem);
+      dropzone.insertItemAt(index, anotherItem);
 
-      expect(dropzone.items[0]).toEqual(anotherItem);
+      expect(dropzone.items[index]).toEqual(anotherItem);
       expect(anotherItem.dropzone).toEqual(dropzone);
     });
   });
