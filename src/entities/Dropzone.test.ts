@@ -36,4 +36,17 @@ describe("Dropzone", () => {
 
     dropzone.items.forEach((item, i) => expect(item.itemElement).toEqual(children[i]));
   });
+
+  describe("id", () => {
+    it("should return id prop of source HTML element", () => {
+      const dropzoneElement = document.createElement("div");
+      const dropzoneElementId = "foobar";
+
+      dropzoneElement.id = dropzoneElementId;
+
+      const dropzone = new Dropzone(dropzoneElement);
+
+      expect(dropzone.id).toEqual(dropzoneElementId);
+    });
+  });
 });
