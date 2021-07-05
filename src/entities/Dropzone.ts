@@ -40,27 +40,35 @@ export class Dropzone {
   };
 
   allowStretching = (animationSpeed: number) =>
-    (this._container.style.transition = `height .${animationSpeed}s ease`);
+    (this.container.style.transition = `height .${animationSpeed}s ease`);
 
-  indexOfItem = (item: Item) => this._items.indexOf(item);
+  indexOfItem = (item: Item) => this.items.indexOf(item);
 
   insertItemAt = (index: number, item: Item) => {
-    this._items.splice(index, 0, item);
+    this.items.splice(index, 0, item);
     item.updateDropzone(this);
   };
 
-  removeItemAt = (index: number) => this._items.splice(index, 1);
+  removeItemAt = (index: number) => this.items.splice(index, 1);
 
   switchItemPosition = (from: number, to: number) =>
     this.insertItemAt(to, this.removeItemAt(from)[0]);
 
   isHoveringFreeSpaceNearItem = (item: Item, e: MouseEvent) => {
-    const itemIndex = this._items.lastIndexOf(item);
-    const nextItem = itemIndex === -1 ? null : this._items[itemIndex + 1];
+    const itemIndex = this.indexOfItem(item);
+    const nextItem = itemIndex === -1 ? null : this.items[itemIndex + 1];
 
     const isNextItemOnNextRow = nextItem?.rect.y !== item.rect.y;
 
-    return isNextItemOnNextRow && item.hoveringNear(e);
+    return isNextItemOnNextRow && this.isHoveringNearItem(e, item);
+  };
+
+  isHoveringNearItem = ({ clientX, clientY }: MouseEvent, item: Item) => {
+    const { right, y } = item.rect;
+
+    return (
+      clientX > right && clientX < this.rect.right && clientY > y && clientY < this.rect.bottom
+    );
   };
 
   repositionItems = (
@@ -86,7 +94,7 @@ export class Dropzone {
       const shouldAnimateItemPositioning = animated && item !== draggedItem;
       item.toggleAnimation(shouldAnimateItemPositioning, animationSpeed);
 
-      item.placeInDropzone({ xOffset, yOffset });
+      item.applyDropzoneOffset({ xOffset, yOffset });
 
       // Get horizonral offset for next item
       xOffset += item.getFullWidth() + gridGap;
@@ -98,6 +106,17 @@ export class Dropzone {
 
     // Extend container height
     this.container.style.height = `${resultingContainerHeight}px`;
+  };
+
+  isEmptyAndHovered = (e: MouseEvent) => {
+    const isDropzoneEmpty = !this.items.length;
+    const isCursorInsideDropzone =
+      e.clientX > this.container.getBoundingClientRect().x &&
+      e.clientX < this.container.getBoundingClientRect().right &&
+      e.clientY > this.container.getBoundingClientRect().y &&
+      e.clientY < this.container.getBoundingClientRect().bottom;
+
+    return isDropzoneEmpty && isCursorInsideDropzone;
   };
 }
 

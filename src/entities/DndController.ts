@@ -98,17 +98,6 @@ class DndController {
 
   moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
 
-  isDraggingOverEmptyDropzone = (dropzone: Dropzone, e: MouseEvent) => {
-    const isDropzoneEmpty = !dropzone.items.length;
-    const isCursorInsideDropzone =
-      e.clientX > dropzone.container.getBoundingClientRect().x &&
-      e.clientX < dropzone.container.getBoundingClientRect().right &&
-      e.clientY > dropzone.container.getBoundingClientRect().y &&
-      e.clientY < dropzone.container.getBoundingClientRect().bottom;
-
-    return isDropzoneEmpty && isCursorInsideDropzone;
-  };
-
   placeDraggedItemInNewDropzone = (newDropzone: Dropzone, item: Item, index = 0) => {
     this.grabbedItemCurrentLocation?.dropzone.removeItemAt(
       this.grabbedItemCurrentLocation.index
@@ -138,7 +127,7 @@ class DndController {
     if (!this.draggedItem) return;
 
     for (const dropzone of this.dropzones) {
-      if (this.isDraggingOverEmptyDropzone(dropzone, e)) {
+      if (dropzone.isEmptyAndHovered(e)) {
         this.placeDraggedItemInNewDropzone(dropzone, this.draggedItem);
         return;
       }
@@ -153,7 +142,7 @@ class DndController {
         if (isItemHovered) {
           this.handleItemHovered(dropzone, draggedItemIndexInDropzone, item, itemIndex, e);
         } else if (isHoveringFreeSpaceNearItem) {
-          this.handleHoveredNearItem(dropzone, itemIndex);
+          this.handleHoveredNearItem(draggedItemIndexInDropzone, dropzone, itemIndex);
         }
       });
     }
@@ -206,10 +195,12 @@ class DndController {
     return hoveredItemIndex;
   };
 
-  handleHoveredNearItem = (dropzone: Dropzone, itemIndex: number) => {
+  handleHoveredNearItem = (
+    draggedItemIndexInDropzone: number,
+    dropzone: Dropzone,
+    itemIndex: number
+  ) => {
     if (!this.draggedItem) return;
-
-    const draggedItemIndexInDropzone = dropzone.indexOfItem(this.draggedItem);
 
     if (draggedItemIndexInDropzone === -1) {
       this.placeDraggedItemInNewDropzone(dropzone, this.draggedItem, itemIndex + 1);
@@ -243,8 +234,6 @@ class DndController {
     this.dropzones = this.collectDropzones(this.contextWrapper);
 
     for (const dropzone of this.dropzones) {
-      if (!dropzone.container.style.minHeight) dropzone.container.style.minHeight = "30px";
-
       dropzone.items.forEach((item) => {
         item.itemElement.style.position = "absolute";
 
@@ -255,7 +244,7 @@ class DndController {
           this.draggedItem = item;
           this.initialItemGrabLocation = this.grabbedItemCurrentLocation = {
             dropzone: item.dropzone,
-            index: item.dropzone.items.lastIndexOf(item),
+            index: item.dropzone.indexOfItem(item),
           };
         };
       });

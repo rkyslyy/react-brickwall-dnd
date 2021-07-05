@@ -47,17 +47,6 @@ export class Item {
     this.toggleAnimation(true, animationSpeed);
   };
 
-  hoveringNear = ({ clientX, clientY }: MouseEvent) => {
-    const { right, y } = this.rect;
-
-    return (
-      clientX > right &&
-      clientX < this.dropzone.rect.right &&
-      clientY > y &&
-      clientY < this.dropzone.rect.bottom
-    );
-  };
-
   isHovered = ({ clientX, clientY }: MouseEvent) => {
     const { x, y, right, bottom } = this.rect;
 
@@ -72,31 +61,26 @@ export class Item {
 
   getFullWidth = () =>
     this.itemElement.scrollWidth +
-    (parseInt(this.itemElement.style.borderLeft || "0") +
-      parseInt(this.itemElement.style.borderRight || "0"));
+    ((parseInt(this.itemElement.style.borderLeft) || 0) +
+      (parseInt(this.itemElement.style.borderRight) || 0));
 
   getOriginalParent = () => this.itemElement.parentElement;
 
-  getOriginalParentOffset = (): Offset => {
-    return {
-      xOffset:
-        this.dropzone.container.getBoundingClientRect().x -
-        (this.getOriginalParent()?.getBoundingClientRect().x || 0),
-      yOffset:
-        this.dropzone.container.getBoundingClientRect().y -
-        (this.getOriginalParent()?.getBoundingClientRect().y || 0),
-    };
-  };
+  getOriginalParentOffset = (): Offset => ({
+    xOffset: this.dropzone.rect.x - (this.getOriginalParent()?.getBoundingClientRect().x || 0),
+    yOffset: this.dropzone.rect.y - (this.getOriginalParent()?.getBoundingClientRect().y || 0),
+  });
 
   getPositionInDropzone = (dropzone: Dropzone) => dropzone.items.indexOf(this);
 
-  placeInDropzone = (dropzoneOffset: Offset) => {
-    const realParentOffset = this.getOriginalParentOffset();
+  applyDropzoneOffset = (dropzoneOffset: Offset) => {
+    const originalParentOffset = this.getOriginalParentOffset();
+
     this.itemElement.style.marginLeft = `${
-      dropzoneOffset.xOffset + realParentOffset.xOffset
+      dropzoneOffset.xOffset + originalParentOffset.xOffset
     }px`;
     this.itemElement.style.marginTop = `${
-      dropzoneOffset.yOffset + realParentOffset.yOffset
+      dropzoneOffset.yOffset + originalParentOffset.yOffset
     }px`;
     this.itemElement.style.cursor = "grab";
   };

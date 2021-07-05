@@ -6,6 +6,10 @@ describe("Item", () => {
   let dropzoneElement: HTMLElement;
   let itemElement: HTMLElement;
 
+  let dropzone: Dropzone;
+  let item: Item;
+  let mouseEvent: MouseEvent;
+
   beforeEach(() => {
     dropzoneElement = document.createElement("div");
     dropzoneElement.style.width = "500px";
@@ -15,13 +19,13 @@ describe("Item", () => {
     itemElement.style.width = "100px";
     itemElement.style.height = "50px";
 
-    document.body.appendChild(dropzoneElement);
-    document.body.appendChild(itemElement);
+    dropzone = new Dropzone(dropzoneElement);
+    item = new Item(dropzone, itemElement);
+    mouseEvent = new MouseEvent("mousemove");
   });
+
   describe("toggleAnimation()", () => {
     it("should correctly enable animation", () => {
-      const dropzone = new Dropzone(dropzoneElement);
-      const item = new Item(dropzone, itemElement);
       const animationSpeed = 300;
 
       item.toggleAnimation(true, animationSpeed);
@@ -34,9 +38,6 @@ describe("Item", () => {
     it("should correctly disable animation", () => {
       itemElement.style.transition = "all 1s ease";
 
-      const dropzone = new Dropzone(dropzoneElement);
-      const item = new Item(dropzone, itemElement);
-
       item.toggleAnimation(false);
 
       expect(itemElement.style.transition).toEqual("");
@@ -45,24 +46,18 @@ describe("Item", () => {
 
   describe("applyMouseDownStyle()", () => {
     it("should set all MOUSE_DOWN_STYLE props to itemElement.style and call Item.protoptype.move() with passed event", () => {
-      const dropzone = new Dropzone(dropzoneElement);
-      const item = new Item(dropzone, itemElement);
-      const event = new MouseEvent("mousemove");
-
       jest.spyOn(item, "move");
-      item.applyMouseDownStyle(event);
+      item.applyMouseDownStyle(mouseEvent);
 
       Object.keys(MOUSE_DOWN_STYLE).forEach((key) =>
         expect(itemElement.style[key]).toEqual(MOUSE_DOWN_STYLE[key])
       );
-      expect(item.move).toHaveBeenCalledWith(event);
+      expect(item.move).toHaveBeenCalledWith(mouseEvent);
     });
   });
 
   describe("applyDefaultStyle()", () => {
     it("should set all DEFAULT_STYLE props to itemElement.style and call Item.protoptype.toggleAnimation() with passed animationSpeed", () => {
-      const dropzone = new Dropzone(dropzoneElement);
-      const item = new Item(dropzone, itemElement);
       const animationSpeed = 300;
 
       jest.spyOn(item, "toggleAnimation");
@@ -72,6 +67,103 @@ describe("Item", () => {
         expect(itemElement.style[key]).toEqual(DEFAULT_STYLE[key])
       );
       expect(item.toggleAnimation).toHaveBeenCalledWith(true, animationSpeed);
+    });
+  });
+
+  describe("isHovered()", () => {
+    it("should return true if mouse event coordinates are inside item", () => {
+      jest.spyOn(item, "rect", "get").mockReturnValue({
+        x: 80,
+        y: 40,
+        right: 180,
+        bottom: 100,
+      } as DOMRect);
+
+      jest.spyOn(mouseEvent, "clientX", "get").mockReturnValue(100);
+      jest.spyOn(mouseEvent, "clientY", "get").mockReturnValue(50);
+
+      expect(item.isHovered(mouseEvent)).toEqual(true);
+    });
+
+    it("should return false if mouse event coordinates are outside item", () => {
+      jest
+        .spyOn(item, "rect", "get")
+        .mockReturnValue({ x: 80, y: 40, right: 180, bottom: 100 } as DOMRect);
+
+      jest.spyOn(mouseEvent, "clientX", "get").mockReturnValue(100);
+      jest.spyOn(mouseEvent, "clientY", "get").mockReturnValue(200);
+
+      expect(item.isHovered(mouseEvent)).toEqual(false);
+    });
+  });
+
+  describe("isLeftSideHovered()", () => {
+    it("should return true if mouse event horizontal position is less than half of item width", () => {
+      jest.spyOn(item, "rect", "get").mockReturnValue({ x: 100, width: 200 } as DOMRect);
+
+      jest.spyOn(mouseEvent, "clientX", "get").mockReturnValue(150);
+
+      expect(item.isLeftSideHovered(mouseEvent)).toEqual(true);
+    });
+
+    it("should return false if mouse event horizontal position is more than half of item width", () => {
+      jest.spyOn(item, "rect", "get").mockReturnValue({ x: 100, width: 200 } as DOMRect);
+
+      jest.spyOn(mouseEvent, "clientX", "get").mockReturnValue(210);
+
+      expect(item.isLeftSideHovered(mouseEvent)).toEqual(false);
+    });
+  });
+
+  describe("getFullWidth()", () => {
+    it("should return total width including border width on left and right", () => {
+      const itemClientWidth = 200;
+      const itemLeftBorderWidth = 2;
+      const itemRightBorderWidth = 3;
+
+      jest.spyOn(itemElement, "scrollWidth", "get").mockReturnValue(itemClientWidth);
+      itemElement.style.borderLeft = `${itemLeftBorderWidth}px`;
+      itemElement.style.borderRight = `${itemRightBorderWidth}px`;
+
+      expect(item.getFullWidth()).toEqual(
+        itemClientWidth + itemLeftBorderWidth + itemRightBorderWidth
+      );
+    });
+
+    it("should consider invalid border width strings as when calculating total width", () => {
+      const itemClientWidth = 200;
+
+      jest.spyOn(itemElement, "scrollWidth", "get").mockReturnValue(itemClientWidth);
+      itemElement.style.borderLeft = "invalid0";
+      itemElement.style.borderRight = "invalid1";
+
+      expect(item.getFullWidth()).toEqual(itemClientWidth);
+    });
+  });
+
+  describe("getOriginalParentOffset()", () => {
+    it("should return correct coordinate difference between the dropzone that currently hosts element and element's real HTML parent", () => {
+      const realParentElement = document.createElement("div");
+      const realParentX = 100;
+
+      const realParentY = 200;
+
+      const dropzoneX = 400;
+      const dropzoneY = 400;
+
+      jest
+        .spyOn(realParentElement, "getBoundingClientRect")
+        .mockReturnValue({ x: realParentX, y: realParentY } as DOMRect);
+      jest.spyOn(itemElement, "parentElement", "get").mockReturnValue(realParentElement);
+
+      jest
+        .spyOn(dropzone, "rect", "get")
+        .mockReturnValue({ x: dropzoneX, y: dropzoneY } as DOMRect);
+
+      expect(item.getOriginalParentOffset()).toEqual({
+        xOffset: dropzoneX - realParentX,
+        yOffset: dropzoneY - realParentY,
+      });
     });
   });
 });
