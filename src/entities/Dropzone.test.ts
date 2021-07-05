@@ -1,4 +1,5 @@
 import { Dropzone } from "./Dropzone";
+import Item from "./Item";
 
 describe("Dropzone", () => {
   //   let dropzoneElement: HTMLElement;
@@ -47,6 +48,45 @@ describe("Dropzone", () => {
       const dropzone = new Dropzone(dropzoneElement);
 
       expect(dropzone.id).toEqual(dropzoneElementId);
+    });
+  });
+
+  describe("allowStretching()", () => {
+    it("should set correct transition style to dropzone HTML element", () => {
+      const dropzoneElement = document.createElement("div");
+      const animationSpeed = 300;
+      const dropzone = new Dropzone(dropzoneElement);
+
+      dropzone.allowStretching(animationSpeed);
+
+      expect(dropzoneElement.style.transition).toEqual(`height .${animationSpeed}s ease`);
+    });
+  });
+
+  describe("insertItemAt()", () => {
+    it("should correctly insert item at the start of array", () => {
+      const dropzoneElement = document.createElement("div");
+      const dropzoneChildren = [
+        document.createElement("div"),
+        document.createElement("div"),
+        document.createElement("div"),
+      ];
+
+      dropzoneChildren.forEach((child) => dropzoneElement.appendChild(child));
+
+      const dropzone = new Dropzone(dropzoneElement);
+
+      const anotherDropzoneElement = document.createElement("div");
+      const anotherItemElement = document.createElement("div");
+      const anotherDropzone = new Dropzone(anotherDropzoneElement);
+      const anotherItem = new Item(anotherDropzone, anotherItemElement);
+
+      expect(anotherItem.dropzone).toEqual(anotherDropzone);
+
+      dropzone.insertItemAt(0, anotherItem);
+
+      expect(dropzone.items[0]).toEqual(anotherItem);
+      expect(anotherItem.dropzone).toEqual(dropzone);
     });
   });
 });
