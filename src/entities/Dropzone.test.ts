@@ -244,4 +244,128 @@ describe("Dropzone", () => {
 
     expect(dropzone.isHoveringNearItem(mouseEvent, item)).toEqual(false);
   });
+
+  describe("repositionItems()", () => {
+    it("should correctly place items inside dropzone", () => {
+      const dropzoneElement = document.createElement("div");
+      const dropzoneWidth = 500;
+      const child0 = document.createElement("div");
+      const child1 = document.createElement("div");
+      const child2 = document.createElement("div");
+      const child3 = document.createElement("div");
+      const child4 = document.createElement("div");
+      const gridGap = 20;
+
+      jest.spyOn(dropzoneElement, "clientWidth", "get").mockReturnValue(dropzoneWidth);
+
+      const child0Width = 100;
+      const child1Width = 100;
+      const child2Width = 300;
+      const child3Width = 100;
+      const child4Width = 400;
+
+      jest.spyOn(child0, "scrollWidth", "get").mockReturnValue(child0Width);
+      jest.spyOn(child1, "scrollWidth", "get").mockReturnValue(child1Width);
+      jest.spyOn(child2, "scrollWidth", "get").mockReturnValue(child2Width);
+      jest.spyOn(child3, "scrollWidth", "get").mockReturnValue(child3Width);
+      jest.spyOn(child4, "scrollWidth", "get").mockReturnValue(child4Width);
+
+      [child0, child1, child2, child3, child4].forEach((child) =>
+        dropzoneElement.appendChild(child)
+      );
+
+      const dropzone = new Dropzone(dropzoneElement);
+      const childHeight = 50;
+
+      dropzone.items.forEach((item) => {
+        jest.spyOn(item, "rect", "get").mockReturnValue({ height: childHeight } as DOMRect);
+        jest
+          .spyOn(item, "getOriginalParentOffset")
+          .mockReturnValue({ xOffset: 0, yOffset: 0 });
+      });
+
+      dropzone.repositionItems(false, 300, gridGap, null);
+
+      // for first item offset should only be based on gridGap
+      expect(parseInt(child0.style.marginTop)).toEqual(gridGap);
+      expect(parseInt(child0.style.marginLeft)).toEqual(gridGap);
+
+      // second item should be moved to right by first item width + gridGap
+      expect(parseInt(child1.style.marginTop)).toEqual(gridGap);
+      expect(parseInt(child1.style.marginLeft)).toEqual(
+        gridGap + child0.scrollWidth + gridGap
+      );
+
+      // third item should start on next row since it does not fit
+      expect(parseInt(child2.style.marginTop)).toEqual(gridGap + childHeight + gridGap);
+      expect(parseInt(child2.style.marginLeft)).toEqual(gridGap);
+
+      // fourth item should fit near third one
+      expect(parseInt(child3.style.marginTop)).toEqual(gridGap + childHeight + gridGap);
+      expect(parseInt(child3.style.marginLeft)).toEqual(gridGap + child2Width + gridGap);
+
+      // last item doesnt should go to new row
+      expect(parseInt(child4.style.marginTop)).toEqual(
+        gridGap + childHeight + gridGap + childHeight + gridGap
+      );
+      expect(parseInt(child4.style.marginLeft)).toEqual(gridGap);
+    });
+  });
+
+  describe("isEmptyAndHovered()", () => {
+    it("should return true if cursor is inside dropzone with no items", () => {
+      const dropzoneElement = document.createElement("div");
+      const dropzone = new Dropzone(dropzoneElement);
+      const mouseEvent = new MouseEvent("mousemove");
+
+      jest.spyOn(dropzone.container, "getBoundingClientRect").mockReturnValue({
+        x: 100,
+        y: 100,
+        right: 300,
+        bottom: 300,
+      } as DOMRect);
+      jest.spyOn(mouseEvent, "clientX", "get").mockReturnValue(150);
+      jest.spyOn(mouseEvent, "clientY", "get").mockReturnValue(150);
+
+      expect(dropzone.isEmptyAndHovered(mouseEvent)).toEqual(true);
+    });
+
+    it("should return false if cursor is inside dropzone but there are items inside", () => {
+      const dropzoneElement = document.createElement("div");
+      const childElement = document.createElement("div");
+
+      dropzoneElement.appendChild(childElement);
+
+      const dropzone = new Dropzone(dropzoneElement);
+      const mouseEvent = new MouseEvent("mousemove");
+
+      jest.spyOn(dropzone.container, "getBoundingClientRect").mockReturnValue({
+        x: 100,
+        y: 100,
+        right: 300,
+        bottom: 300,
+      } as DOMRect);
+      jest.spyOn(mouseEvent, "clientX", "get").mockReturnValue(150);
+      jest.spyOn(mouseEvent, "clientY", "get").mockReturnValue(150);
+
+      expect(dropzone.isEmptyAndHovered(mouseEvent)).toEqual(false);
+    });
+
+    it("should return false if cursor is outside dropzone", () => {
+      const dropzoneElement = document.createElement("div");
+      const dropzone = new Dropzone(dropzoneElement);
+      const mouseEvent = new MouseEvent("mousemove");
+
+      jest.spyOn(dropzone.container, "getBoundingClientRect").mockReturnValue({
+        x: 400,
+        y: 100,
+        right: 300,
+        bottom: 300,
+      } as DOMRect);
+      jest.spyOn(mouseEvent, "clientX", "get").mockReturnValue(150);
+      jest.spyOn(mouseEvent, "clientY", "get").mockReturnValue(150);
+
+      expect(dropzone.isEmptyAndHovered(mouseEvent)).toEqual(false);
+    });
+  });
 });
