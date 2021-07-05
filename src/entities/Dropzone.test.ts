@@ -102,13 +102,17 @@ describe("Dropzone", () => {
       dropzoneChildren.forEach((child) => dropzoneElement.appendChild(child));
 
       const dropzone = new Dropzone(dropzoneElement);
+
+      const item0 = dropzone.items[0];
+      const item1 = dropzone.items[1];
+
       const from = 0;
       const to = 1;
 
       dropzone.switchItemPosition(from, to);
 
-      expect(dropzone.items[0]).toEqual(child1);
-      expect(dropzone.items[1]).toEqual(child0);
+      expect(dropzone.items[0]).toEqual(item1);
+      expect(dropzone.items[1]).toEqual(item0);
     });
   });
 });
