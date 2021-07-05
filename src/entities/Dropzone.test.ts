@@ -188,4 +188,60 @@ describe("Dropzone", () => {
       expect(dropzone.isHoveringAvailableSpaceNearItem(hoveredItem, event)).toEqual(false);
     });
   });
+
+  describe("isHoveringNearItem()", () => {
+    it("should return true if mouse coordinates are on the right of item", () => {
+      const dropzoneElement = document.createElement("div");
+      const child = document.createElement("div");
+
+      dropzoneElement.appendChild(child);
+
+      const dropzone = new Dropzone(dropzoneElement);
+      const item = dropzone.items[0];
+      const mouseEvent = new MouseEvent("mousemove");
+
+      jest
+        .spyOn(dropzone, "rect", "get")
+        .mockReturnValue({ bottom: 400, right: 500 } as DOMRect);
+
+      jest.spyOn(item, "rect", "get").mockReturnValue({
+        x: 80,
+        y: 40,
+        right: 180,
+        bottom: 100,
+      } as DOMRect);
+
+      jest.spyOn(mouseEvent, "clientX", "get").mockReturnValue(200);
+      jest.spyOn(mouseEvent, "clientY", "get").mockReturnValue(50);
+
+      expect(dropzone.isHoveringNearItem(mouseEvent, item)).toEqual(true);
+    });
+  });
+
+  it("should return false if mouse coordinates are not on the right of item", () => {
+    const dropzoneElement = document.createElement("div");
+    const child = document.createElement("div");
+
+    dropzoneElement.appendChild(child);
+
+    const dropzone = new Dropzone(dropzoneElement);
+    const item = dropzone.items[0];
+    const mouseEvent = new MouseEvent("mousemove");
+
+    jest
+      .spyOn(dropzone, "rect", "get")
+      .mockReturnValue({ bottom: 400, right: 500 } as DOMRect);
+
+    jest.spyOn(item, "rect", "get").mockReturnValue({
+      x: 80,
+      y: 40,
+      right: 180,
+      bottom: 100,
+    } as DOMRect);
+
+    jest.spyOn(mouseEvent, "clientX", "get").mockReturnValue(50);
+    jest.spyOn(mouseEvent, "clientY", "get").mockReturnValue(50);
+
+    expect(dropzone.isHoveringNearItem(mouseEvent, item)).toEqual(false);
+  });
 });
