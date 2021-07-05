@@ -96,7 +96,7 @@ class DndController {
     this.repositionItems(false);
   };
 
-  moveDraggedItem = (e: MouseEvent) => this.draggedItem?.move(e);
+  moveDraggedItem = (e: MouseEvent) => this.draggedItem?.moveOnScreen(e);
 
   placeDraggedItemInNewDropzone = (newDropzone: Dropzone, item: Item, index = 0) => {
     this.grabbedItemCurrentLocation?.dropzone.removeItemAt(

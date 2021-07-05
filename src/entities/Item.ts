@@ -38,7 +38,7 @@ export class Item {
   applyMouseDownStyle = (event: MouseEvent) => {
     Object.assign(this.itemElement.style, MOUSE_DOWN_STYLE);
 
-    this.move(event);
+    this.moveOnScreen(event);
   };
 
   applyDefaultStyle = (animationSpeed: number) => {
@@ -85,7 +85,7 @@ export class Item {
     this.itemElement.style.cursor = "grab";
   };
 
-  move = (event: MouseEvent) => {
+  moveOnScreen = (event: MouseEvent) => {
     const { xOffset, yOffset } = this.getOriginalParentOffset();
 
     this.itemElement.style.marginLeft = `${

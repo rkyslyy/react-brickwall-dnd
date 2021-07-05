@@ -46,13 +46,13 @@ describe("Item", () => {
 
   describe("applyMouseDownStyle()", () => {
     it("should set all MOUSE_DOWN_STYLE props to itemElement.style and call Item.protoptype.move() with passed event", () => {
-      jest.spyOn(item, "move");
+      jest.spyOn(item, "moveOnScreen");
       item.applyMouseDownStyle(mouseEvent);
 
       Object.keys(MOUSE_DOWN_STYLE).forEach((key) =>
         expect(itemElement.style[key]).toEqual(MOUSE_DOWN_STYLE[key])
       );
-      expect(item.move).toHaveBeenCalledWith(mouseEvent);
+      expect(item.moveOnScreen).toHaveBeenCalledWith(mouseEvent);
     });
   });
 
@@ -143,27 +143,45 @@ describe("Item", () => {
 
   describe("getOriginalParentOffset()", () => {
     it("should return correct coordinate difference between the dropzone that currently hosts element and element's real HTML parent", () => {
-      const realParentElement = document.createElement("div");
-      const realParentX = 100;
-
-      const realParentY = 200;
+      const originalParentElement = document.createElement("div");
+      const originalParentX = 100;
+      const originalParentY = 200;
 
       const dropzoneX = 400;
       const dropzoneY = 400;
 
       jest
-        .spyOn(realParentElement, "getBoundingClientRect")
-        .mockReturnValue({ x: realParentX, y: realParentY } as DOMRect);
-      jest.spyOn(itemElement, "parentElement", "get").mockReturnValue(realParentElement);
+        .spyOn(originalParentElement, "getBoundingClientRect")
+        .mockReturnValue({ x: originalParentX, y: originalParentY } as DOMRect);
+      jest.spyOn(itemElement, "parentElement", "get").mockReturnValue(originalParentElement);
 
       jest
         .spyOn(dropzone, "rect", "get")
         .mockReturnValue({ x: dropzoneX, y: dropzoneY } as DOMRect);
 
       expect(item.getOriginalParentOffset()).toEqual({
-        xOffset: dropzoneX - realParentX,
-        yOffset: dropzoneY - realParentY,
+        xOffset: dropzoneX - originalParentX,
+        yOffset: dropzoneY - originalParentY,
       });
+    });
+  });
+
+  describe("applyDropzoneOffset()", () => {
+    it("should set correct marginLeft and marginRight considering original parent offset X and Y, and apply 'grab' cursor style", () => {
+      const dropzoneOffset = { xOffset: 100, yOffset: 200 };
+      const originalParentOffset = { xOffset: 500, yOffset: 500 };
+
+      jest.spyOn(item, "getOriginalParentOffset").mockReturnValue(originalParentOffset);
+
+      item.applyDropzoneOffset(dropzoneOffset);
+
+      expect(itemElement.style.marginLeft).toEqual(
+        `${dropzoneOffset.xOffset + originalParentOffset.xOffset}px`
+      );
+      expect(itemElement.style.marginTop).toEqual(
+        `${dropzoneOffset.yOffset + originalParentOffset.yOffset}px`
+      );
+      expect(itemElement.style.cursor).toEqual("grab");
     });
   });
 });
