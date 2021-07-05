@@ -27,6 +27,10 @@ export class Dropzone {
     return this._items;
   }
 
+  get rect() {
+    return this.container.getBoundingClientRect();
+  }
+
   allowStretching = (animationSpeed: number) =>
     (this._container.style.transition = `height .${animationSpeed}s ease`);
 
