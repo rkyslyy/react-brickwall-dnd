@@ -45,7 +45,6 @@ export class Dropzone {
   indexOfItem = (item: Item) => this.items.indexOf(item);
 
   insertItemAt = (index: number, item: Item) => {
-    item.dropzone.removeItemAt(item.dropzone.indexOfItem(item));
     this.items.splice(index, 0, item);
     item.updateDropzone(this);
   };
