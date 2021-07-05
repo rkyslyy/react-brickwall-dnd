@@ -9,14 +9,14 @@ const Brickwall: React.FC<BrickwallProps> = ({
   animationSpeed = DEFAULT_ANIMATION_SPEED,
   children,
   gridGap = 0,
-  onItemsReposition,
+  onItemDrop,
   wrapperClassname,
 }) => {
   const dndController = React.useRef(
     new DndController({
       animationSpeed,
       gridGap,
-      onItemsReposition,
+      onItemDrop,
     })
   );
 

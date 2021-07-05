@@ -1,6 +1,6 @@
 import { Dropzone } from "../../entities";
 
-export type OnChildRepositionCallback = (
+export type OnItemDropCallback = (
   fromId: string,
   fromIndex: number,
   toId: string,
@@ -11,7 +11,7 @@ export interface BrickwallProps {
   animationSpeed?: number;
   gridGap?: number;
   wrapperClassname?: string;
-  onItemsReposition: OnChildRepositionCallback;
+  onItemDrop: OnItemDropCallback;
 }
 
 export interface DraggedItemSource {

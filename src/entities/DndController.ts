@@ -1,7 +1,4 @@
-import {
-  Location,
-  OnChildRepositionCallback,
-} from "./../components/Brickwall/Brickwall.models";
+import { Location, OnItemDropCallback } from "./../components/Brickwall/Brickwall.models";
 import { hasBrickwallId } from "../utils/hasBrickwallId";
 
 import Item from "./Item";
@@ -11,7 +8,7 @@ import { wait } from "../utils/wait";
 interface DndControllerOptions {
   animationSpeed: number;
   gridGap: number;
-  onItemsReposition: OnChildRepositionCallback;
+  onItemDrop: OnItemDropCallback;
 }
 
 class DndController {
@@ -22,15 +19,15 @@ class DndController {
 
   animationSpeed: number;
   gridGap: number;
-  onItemsReposition: OnChildRepositionCallback;
+  onItemDrop: OnItemDropCallback;
 
   initialItemGrabLocation: Location | null;
   grabbedItemCurrentLocation: Location | null;
 
-  constructor({ animationSpeed, gridGap, onItemsReposition }: DndControllerOptions) {
+  constructor({ animationSpeed, gridGap, onItemDrop }: DndControllerOptions) {
     this.animationSpeed = animationSpeed;
     this.gridGap = gridGap;
-    this.onItemsReposition = onItemsReposition;
+    this.onItemDrop = onItemDrop;
   }
 
   setup = (contextWrapper: HTMLElement | null) => {
@@ -43,7 +40,7 @@ class DndController {
     // Initial positioning
     this.repositionItems(false);
 
-    // Enable stretch animation on dropzones
+    // Enable stretch animation on dropzones once initial positioning is finished
     process.nextTick(() =>
       this.dropzones.forEach((dropzone) => dropzone.allowStretching(this.animationSpeed))
     );
@@ -79,7 +76,7 @@ class DndController {
     await wait(this.animationSpeed); // to not interrupt final animation
 
     if (!!this.initialItemGrabLocation && !!this.grabbedItemCurrentLocation) {
-      this.onItemsReposition(
+      this.onItemDrop(
         this.initialItemGrabLocation.dropzone.id,
         this.initialItemGrabLocation.index,
         this.grabbedItemCurrentLocation.dropzone.id,
@@ -288,35 +285,7 @@ class DndController {
    */
   repositionItems = (animated: boolean = true) => {
     this.dropzones.forEach((dropzone) => {
-      const maxWidth = dropzone.container.clientWidth;
-
-      let xOffset = this.gridGap;
-      let yOffset = this.gridGap;
-      let resultingContainerHeight = parseInt(dropzone.container.style.minHeight);
-
-      dropzone.items.forEach((item) => {
-        // Decide if we want to render this item near left edge and below current row
-        if (xOffset + item.getFullWidth() + this.gridGap > maxWidth) {
-          xOffset = this.gridGap;
-          yOffset = resultingContainerHeight;
-        }
-
-        // Dragged item should change location without transition effect
-        const shouldAnimateRepositioning = animated && item !== this.draggedItem;
-        item.toggleAnimation(shouldAnimateRepositioning, this.animationSpeed);
-
-        item.placeInDropzone({ xOffset, yOffset });
-
-        // Get horizonral offset for next item
-        xOffset += item.getFullWidth() + this.gridGap;
-
-        // Extend resulting container height if item won't fit in current row
-        if (item.rect.height + yOffset > resultingContainerHeight)
-          resultingContainerHeight = yOffset + item.rect.height + this.gridGap;
-      });
-
-      // Extend container height
-      dropzone.container.style.height = `${resultingContainerHeight}px`;
+      dropzone.repositionItems(animated, this.animationSpeed, this.gridGap, this.draggedItem);
     });
   };
 }

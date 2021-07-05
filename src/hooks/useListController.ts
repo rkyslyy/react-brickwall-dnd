@@ -3,7 +3,7 @@ import React from "react";
 export const useListController = <K extends string, V>(itemListsMapping: Record<K, V[]>) => {
   const [lists, setLists] = React.useState(itemListsMapping);
 
-  const handleItemReposition = React.useCallback(
+  const handleItemDrop = React.useCallback(
     (fromId: string, fromIndex: number, toId: string, toIndex: number) => {
       const copy = { ...lists };
       const item = copy[fromId].splice(fromIndex, 1)[0];
@@ -15,5 +15,5 @@ export const useListController = <K extends string, V>(itemListsMapping: Record<
     [lists]
   );
 
-  return { lists, handleItemReposition };
+  return { lists, handleItemDrop };
 };
