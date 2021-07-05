@@ -55,7 +55,7 @@ export class Dropzone {
   switchItemPosition = (from: number, to: number) =>
     this.insertItemAt(to, this.removeItemAt(from)[0]);
 
-  isHoveringFreeSpaceNearItem = (item: Item, e: MouseEvent) => {
+  isHoveringAvailableSpaceNearItem = (item: Item, e: MouseEvent) => {
     const itemIndex = this.indexOfItem(item);
     const nextItem = itemIndex === -1 ? null : this.items[itemIndex + 1];
 

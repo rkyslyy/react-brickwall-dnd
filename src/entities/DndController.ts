@@ -135,7 +135,7 @@ class DndController {
         if (!this.draggedItem || this.draggedItem === item) return;
 
         const isItemHovered = item.isHovered(e);
-        const isHoveringFreeSpaceNearItem = dropzone.isHoveringFreeSpaceNearItem(item, e);
+        const isHoveringFreeSpaceNearItem = dropzone.isHoveringAvailableSpaceNearItem(item, e);
         const draggedItemIndexInDropzone = dropzone.indexOfItem(this.draggedItem);
 
         if (isItemHovered) {

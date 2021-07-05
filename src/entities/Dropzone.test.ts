@@ -115,4 +115,77 @@ describe("Dropzone", () => {
       expect(dropzone.items[1]).toEqual(item0);
     });
   });
+
+  describe("isHoveringAvailableSpaceNearItem()", () => {
+    it("should return true if cursor is on the right of item and there's no next item", () => {
+      const dropzoneElement = document.createElement("div");
+
+      const child0 = document.createElement("div");
+      const child1 = document.createElement("div");
+      const child2 = document.createElement("div");
+      jest.spyOn(child2, "getBoundingClientRect").mockReturnValue({ y: 50 } as DOMRect);
+
+      const dropzoneChildren = [child0, child1, child2];
+
+      dropzoneChildren.forEach((child) => dropzoneElement.appendChild(child));
+
+      const dropzone = new Dropzone(dropzoneElement);
+
+      const hoveredItem = dropzone.items[2];
+
+      const event = new MouseEvent("mousemove");
+
+      jest.spyOn(dropzone, "isHoveringNearItem").mockReturnValue(true);
+
+      expect(dropzone.isHoveringAvailableSpaceNearItem(hoveredItem, event)).toEqual(true);
+    });
+
+    it("should return true if cursor is on the right of item and there a next item in the next row", () => {
+      const dropzoneElement = document.createElement("div");
+
+      const child0 = document.createElement("div");
+      const child1 = document.createElement("div");
+      const child2 = document.createElement("div");
+      jest.spyOn(child1, "getBoundingClientRect").mockReturnValue({ y: 50 } as DOMRect);
+      jest.spyOn(child2, "getBoundingClientRect").mockReturnValue({ y: 100 } as DOMRect);
+
+      const dropzoneChildren = [child0, child1, child2];
+
+      dropzoneChildren.forEach((child) => dropzoneElement.appendChild(child));
+
+      const dropzone = new Dropzone(dropzoneElement);
+
+      const hoveredItem = dropzone.items[1];
+
+      const event = new MouseEvent("mousemove");
+
+      jest.spyOn(dropzone, "isHoveringNearItem").mockReturnValue(true);
+
+      expect(dropzone.isHoveringAvailableSpaceNearItem(hoveredItem, event)).toEqual(true);
+    });
+
+    it("should return false if cursor is on the right of item and there a next item in the same row", () => {
+      const dropzoneElement = document.createElement("div");
+
+      const child0 = document.createElement("div");
+      const child1 = document.createElement("div");
+      const child2 = document.createElement("div");
+      jest.spyOn(child1, "getBoundingClientRect").mockReturnValue({ y: 50 } as DOMRect);
+      jest.spyOn(child2, "getBoundingClientRect").mockReturnValue({ y: 50 } as DOMRect);
+
+      const dropzoneChildren = [child0, child1, child2];
+
+      dropzoneChildren.forEach((child) => dropzoneElement.appendChild(child));
+
+      const dropzone = new Dropzone(dropzoneElement);
+
+      const hoveredItem = dropzone.items[1];
+
+      const event = new MouseEvent("mousemove");
+
+      jest.spyOn(dropzone, "isHoveringNearItem").mockReturnValue(true);
+
+      expect(dropzone.isHoveringAvailableSpaceNearItem(hoveredItem, event)).toEqual(false);
+    });
+  });
 });
