@@ -22,6 +22,12 @@ const Brickwall: React.FC<BrickwallProps> = ({
 
   React.useEffect(() => dndController.current.rebuildDropzones(), [children]);
 
+  React.useEffect(() => {
+    return () => {
+      dndController.current.cleanUp();
+    };
+  }, []);
+
   return (
     <div className={wrapperClassname} ref={dndController.current.setup}>
       {children}

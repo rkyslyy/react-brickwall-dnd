@@ -10,9 +10,6 @@
     "lint": "tslint -c tslint.json src/**/*.ts",
     "prepublish": "npm run build"
   },
-  "jest": {
-    "rootDir": "./src"
-  },
   "author": "",
   "license": "ISC",
   "dependencies": {

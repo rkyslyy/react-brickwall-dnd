@@ -53,10 +53,11 @@ class DndController {
   prepareDocument = () => {
     document.addEventListener("mouseup", this.clearDraggedItem);
     document.addEventListener("mousemove", this.moveDraggedItem);
-    return () => {
-      document.removeEventListener("mouseup", this.clearDraggedItem);
-      document.removeEventListener("mousemove", this.moveDraggedItem);
-    };
+  };
+
+  cleanUp = () => {
+    document.removeEventListener("mouseup", this.clearDraggedItem);
+    document.removeEventListener("mousemove", this.moveDraggedItem);
   };
 
   /**
