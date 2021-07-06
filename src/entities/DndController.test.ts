@@ -1,6 +1,6 @@
 import "../setup";
 
-import DndController from "./DndController";
+import DndController, { MANDATORY_WRAPPER_STYLE } from "./DndController";
 
 describe("DndController", () => {
   const animationSpeed = 100;
@@ -491,6 +491,22 @@ describe("DndController", () => {
           hoveredItemIndex
         )
       ).toEqual(hoveredItemIndex + 1);
+    });
+  });
+
+  describe("prepareContextWrapper()", () => {
+    it("should set contextWrapper, set wrapper mandatory styles and set onmousemove event to wrapper", () => {
+      const wrapperElement = document.createElement("div");
+
+      jest.spyOn(wrapperElement, "onmousemove", "get");
+
+      dndController.prepareContextWrapper(wrapperElement);
+
+      expect(dndController.contextWrapper).toBe(wrapperElement);
+      Object.keys(MANDATORY_WRAPPER_STYLE).forEach((key) =>
+        expect(wrapperElement.style[key]).toEqual(MANDATORY_WRAPPER_STYLE[key])
+      );
+      expect(wrapperElement.onmousemove).toBe(dndController.handleContextWrapperMouseMove);
     });
   });
 });

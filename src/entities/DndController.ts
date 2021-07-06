@@ -5,6 +5,11 @@ import Item from "./Item";
 import Dropzone from "./Dropzone";
 import { wait } from "../utils/wait";
 
+export const MANDATORY_WRAPPER_STYLE = {
+  display: "flex",
+  position: "relative",
+};
+
 interface DndControllerOptions {
   animationSpeed: number;
   gridGap: number;
@@ -219,8 +224,7 @@ class DndController {
   prepareContextWrapper = (contextWrapper: HTMLElement) => {
     this.contextWrapper = contextWrapper;
 
-    contextWrapper.style.display = "flex";
-    contextWrapper.style.position = "relative";
+    Object.assign(contextWrapper.style, MANDATORY_WRAPPER_STYLE);
 
     contextWrapper.onmousemove = this.handleContextWrapperMouseMove;
   };
