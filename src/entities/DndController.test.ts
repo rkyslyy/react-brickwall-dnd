@@ -226,7 +226,6 @@ describe("DndController", () => {
     let dropzoneElement1: HTMLElement;
     let itemElement0: HTMLElement;
     let itemElement1: HTMLElement;
-    // let itemElement2: HTMLElement;
 
     beforeEach(() => {
       wrapperElement = document.createElement("div");
@@ -234,20 +233,18 @@ describe("DndController", () => {
       dropzoneElement1 = document.createElement("div");
       itemElement0 = document.createElement("div");
       itemElement1 = document.createElement("div");
-      // itemElement2 = document.createElement("div");
 
       dropzoneElement0.id = "bw-dz-a";
       dropzoneElement1.id = "bw-dz-b";
       dropzoneElement1.appendChild(itemElement0);
       dropzoneElement1.appendChild(itemElement1);
-      // dropzoneElement1.appendChild(itemElement2);
       wrapperElement.appendChild(dropzoneElement0);
       wrapperElement.appendChild(dropzoneElement1);
+
+      dndController.setup(wrapperElement);
     });
 
     it("should loop through dropzones and correctly handle empty dropzone", () => {
-      dndController.setup(wrapperElement);
-
       const emptyDropzone = dndController.dropzones[0];
       const dropzone = dndController.dropzones[1];
       const draggedItem = dropzone.items[0];
@@ -263,8 +260,6 @@ describe("DndController", () => {
     });
 
     it("should loop through dropzones and correctly handle non-empty dropzone with it's item hovered", () => {
-      dndController.setup(wrapperElement);
-
       const dropzone = dndController.dropzones[1];
       const draggedItemIndex = 0;
       const draggedItem = dropzone.items[draggedItemIndex];
@@ -290,8 +285,6 @@ describe("DndController", () => {
     });
 
     it("should loop through dropzones and correctly handle non-empty dropzone with it's item hovered nearby", () => {
-      dndController.setup(wrapperElement);
-
       const dropzone = dndController.dropzones[1];
       const draggedItemIndex = 0;
       const draggedItem = dropzone.items[draggedItemIndex];
@@ -314,6 +307,141 @@ describe("DndController", () => {
         dropzone,
         hoveredNearbyItemIndex
       );
+    });
+  });
+
+  describe("handleItemHovered()", () => {
+    const mouseEvent = new MouseEvent("mousemove");
+
+    let wrapperElement: HTMLElement;
+    let dropzoneElement0: HTMLElement;
+    let dropzoneElement1: HTMLElement;
+    let itemElement0: HTMLElement;
+    let itemElement1: HTMLElement;
+    let itemElement2: HTMLElement;
+
+    beforeEach(() => {
+      wrapperElement = document.createElement("div");
+      dropzoneElement0 = document.createElement("div");
+      dropzoneElement1 = document.createElement("div");
+      itemElement0 = document.createElement("div");
+      itemElement1 = document.createElement("div");
+      itemElement2 = document.createElement("div");
+
+      dropzoneElement0.id = "bw-dz-a";
+      dropzoneElement1.id = "bw-dz-b";
+    });
+
+    describe("hovering over item from different dropzone", () => {
+      beforeEach(() => {
+        dropzoneElement0.appendChild(itemElement0);
+        dropzoneElement1.appendChild(itemElement1);
+        wrapperElement.appendChild(dropzoneElement0);
+        wrapperElement.appendChild(dropzoneElement1);
+
+        dndController.setup(wrapperElement);
+      });
+
+      it("should call placeDraggedItemInNewDropzone() with correct desired index for dragged item when hovering on left side", () => {
+        const sourceDropzone = dndController.dropzones[0];
+        const destinationDropzone = dndController.dropzones[1];
+
+        const draggedItem = sourceDropzone.items[0];
+        const hoveredItem = destinationDropzone.items[0];
+
+        const draggedItemIndexInTargetDropzone = -1;
+
+        dndController.draggedItem = draggedItem;
+
+        jest.spyOn(hoveredItem, "isLeftSideHovered").mockReturnValue(true);
+        jest.spyOn(dndController, "placeDraggedItemInNewDropzone");
+
+        dndController.handleItemHovered(
+          destinationDropzone,
+          draggedItemIndexInTargetDropzone,
+          hoveredItem,
+          0,
+          mouseEvent
+        );
+
+        const expectedDraggedItemDesiredIndex = 0;
+        expect(dndController.placeDraggedItemInNewDropzone).toHaveBeenCalledWith(
+          destinationDropzone,
+          draggedItem,
+          expectedDraggedItemDesiredIndex
+        );
+      });
+
+      it("should call placeDraggedItemInNewDropzone() with correct desired index for dragged item when hovering on right side", () => {
+        const sourceDropzone = dndController.dropzones[0];
+        const destinationDropzone = dndController.dropzones[1];
+
+        const draggedItem = sourceDropzone.items[0];
+        const hoveredItem = destinationDropzone.items[0];
+
+        const draggedItemIndexInTargetDropzone = -1;
+
+        dndController.draggedItem = draggedItem;
+
+        jest.spyOn(hoveredItem, "isLeftSideHovered").mockReturnValue(false);
+        jest.spyOn(dndController, "placeDraggedItemInNewDropzone");
+
+        dndController.handleItemHovered(
+          destinationDropzone,
+          draggedItemIndexInTargetDropzone,
+          hoveredItem,
+          0,
+          mouseEvent
+        );
+
+        const expectedDraggedItemDesiredIndex = 1;
+        expect(dndController.placeDraggedItemInNewDropzone).toHaveBeenCalledWith(
+          destinationDropzone,
+          draggedItem,
+          expectedDraggedItemDesiredIndex
+        );
+      });
+    });
+
+    describe("hovering over item from same dropzone", () => {
+      beforeEach(() => {
+        dropzoneElement0.appendChild(itemElement0);
+        dropzoneElement0.appendChild(itemElement1);
+        dropzoneElement0.appendChild(itemElement2);
+        wrapperElement.appendChild(dropzoneElement0);
+
+        dndController.setup(wrapperElement);
+      });
+
+      it("should call handleIndexSwitchInsideDropzone() with correct desired index for dragged item when hovering on left side", () => {
+        const dropzone = dndController.dropzones[0];
+
+        const draggedItemIndex = 0;
+        const hoveredItemIndex = 2;
+
+        const draggedItem = dropzone.items[draggedItemIndex];
+        const hoveredItem = dropzone.items[hoveredItemIndex];
+
+        jest.spyOn(hoveredItem, "isLeftSideHovered").mockReturnValue(true);
+        jest.spyOn(dndController, "handleIndexSwitchInsideDropzone");
+
+        dndController.draggedItem = draggedItem;
+
+        dndController.handleItemHovered(
+          dropzone,
+          draggedItemIndex,
+          hoveredItem,
+          hoveredItemIndex,
+          mouseEvent
+        );
+
+        const expectedDraggedItemDesiredIndex = 1;
+        expect(dndController.handleIndexSwitchInsideDropzone).toHaveBeenCalledWith(
+          dropzone,
+          draggedItemIndex,
+          expectedDraggedItemDesiredIndex
+        );
+      });
     });
   });
 });

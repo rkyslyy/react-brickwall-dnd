@@ -155,13 +155,13 @@ class DndController {
   ) => {
     if (!this.draggedItem) return;
 
+    const isLeftSideHovered = hoveredItem.isLeftSideHovered(e);
+
     if (draggedItemIndexInDropzone === -1) {
-      const indexForDraggedItem =
-        hoveredItemIndex + (hoveredItem.isLeftSideHovered(e) ? 0 : 1);
+      const indexForDraggedItem = hoveredItemIndex + (isLeftSideHovered ? 0 : 1);
 
       this.placeDraggedItemInNewDropzone(dropzone, this.draggedItem, indexForDraggedItem);
     } else {
-      const isLeftSideHovered = hoveredItem.isLeftSideHovered(e);
       const isDirectionLeft = draggedItemIndexInDropzone > hoveredItemIndex;
       const draggedItemIndexAfterSwitch = Math.max(
         0,
