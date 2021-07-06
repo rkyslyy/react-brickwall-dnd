@@ -541,7 +541,7 @@ describe("DndController", () => {
     it("should set contextWrapper, set wrapper mandatory styles and set onmousemove event to wrapper", () => {
       const wrapperElement = document.createElement("div");
 
-      jest.spyOn(wrapperElement, "onmousemove", "get");
+      jest.spyOn(wrapperElement as any, "onmousemove", "get");
 
       dndController.prepareContextWrapper(wrapperElement);
 
