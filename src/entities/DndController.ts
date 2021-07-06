@@ -135,13 +135,11 @@ class DndController {
       dropzone.items.forEach((item, itemIndex) => {
         if (!this.draggedItem || this.draggedItem === item) return;
 
-        const isItemHovered = item.isHovered(e);
-        const isHoveringFreeSpaceNearItem = dropzone.isHoveringAvailableSpaceNearItem(item, e);
         const draggedItemIndexInDropzone = dropzone.indexOfItem(this.draggedItem);
 
-        if (isItemHovered) {
+        if (item.isHovered(e)) {
           this.handleItemHovered(dropzone, draggedItemIndexInDropzone, item, itemIndex, e);
-        } else if (isHoveringFreeSpaceNearItem) {
+        } else if (dropzone.isHoveringAvailableSpaceNearItem(item, e)) {
           this.handleHoveredNearItem(draggedItemIndexInDropzone, dropzone, itemIndex);
         }
       });

@@ -32,14 +32,6 @@ describe("DndController", () => {
 
     it("should call preparation methods, do initial positioning and enable stretch animation on dropzones", () => {
       const wrapperElement = document.createElement("div");
-      // const dropzoneElement = document.createElement("div");
-      // const itemElement = document.createElement("div");
-
-      // dropzoneElement.appendChild(itemElement);
-
-      // dropzoneElement.id = "bw-dz-a";
-
-      // wrapperElement.appendChild(dropzoneElement);
 
       jest.spyOn(dndController, "prepareDocument").mockReturnValue();
       jest.spyOn(dndController, "prepareContextWrapper").mockReturnValue();
@@ -225,6 +217,103 @@ describe("DndController", () => {
       expect(dropzone.items[1]).toBe(dropzoneItem0);
       expect(dndController.grabbedItemCurrentLocation).toEqual({ dropzone, index: to });
       expect(dndController.repositionItems).toHaveBeenCalled();
+    });
+  });
+
+  describe("handleContextWrapperMouseMove()", () => {
+    let wrapperElement: HTMLElement;
+    let dropzoneElement0: HTMLElement;
+    let dropzoneElement1: HTMLElement;
+    let itemElement0: HTMLElement;
+    let itemElement1: HTMLElement;
+    // let itemElement2: HTMLElement;
+
+    beforeEach(() => {
+      wrapperElement = document.createElement("div");
+      dropzoneElement0 = document.createElement("div");
+      dropzoneElement1 = document.createElement("div");
+      itemElement0 = document.createElement("div");
+      itemElement1 = document.createElement("div");
+      // itemElement2 = document.createElement("div");
+
+      dropzoneElement0.id = "bw-dz-a";
+      dropzoneElement1.id = "bw-dz-b";
+      dropzoneElement1.appendChild(itemElement0);
+      dropzoneElement1.appendChild(itemElement1);
+      // dropzoneElement1.appendChild(itemElement2);
+      wrapperElement.appendChild(dropzoneElement0);
+      wrapperElement.appendChild(dropzoneElement1);
+    });
+
+    it("should loop through dropzones and correctly handle empty dropzone", () => {
+      dndController.setup(wrapperElement);
+
+      const emptyDropzone = dndController.dropzones[0];
+      const dropzone = dndController.dropzones[1];
+      const draggedItem = dropzone.items[0];
+
+      dndController.draggedItem = draggedItem;
+
+      jest.spyOn(emptyDropzone, "isEmptyAndHovered").mockReturnValue(true);
+      jest.spyOn(dndController, "placeDraggedItemInNewDropzone");
+
+      dndController.handleContextWrapperMouseMove(new MouseEvent("mousemove"));
+
+      expect(dndController.placeDraggedItemInNewDropzone(emptyDropzone, draggedItem));
+    });
+
+    it("should loop through dropzones and correctly handle non-empty dropzone with it's item hovered", () => {
+      dndController.setup(wrapperElement);
+
+      const dropzone = dndController.dropzones[1];
+      const draggedItemIndex = 0;
+      const draggedItem = dropzone.items[draggedItemIndex];
+      const hoveredItemIndex = 1;
+      const hoveredItem = dropzone.items[hoveredItemIndex];
+      const mouseEvent = new MouseEvent("mousemove");
+
+      dndController.draggedItem = draggedItem;
+
+      jest.spyOn(hoveredItem, "isHovered").mockReturnValue(true);
+      jest.spyOn(dropzone, "isHoveringAvailableSpaceNearItem").mockReturnValue(false);
+      jest.spyOn(dndController, "handleItemHovered");
+
+      dndController.handleContextWrapperMouseMove(mouseEvent);
+
+      expect(dndController.handleItemHovered).toHaveBeenCalledWith(
+        dropzone,
+        draggedItemIndex,
+        hoveredItem,
+        hoveredItemIndex,
+        mouseEvent
+      );
+    });
+
+    it("should loop through dropzones and correctly handle non-empty dropzone with it's item hovered nearby", () => {
+      dndController.setup(wrapperElement);
+
+      const dropzone = dndController.dropzones[1];
+      const draggedItemIndex = 0;
+      const draggedItem = dropzone.items[draggedItemIndex];
+      const hoveredNearbyItemIndex = 1;
+      const hoveredNearbyItem = dropzone.items[hoveredNearbyItemIndex];
+      const mouseEvent = new MouseEvent("mousemove");
+
+      dndController.draggedItem = draggedItem;
+
+      jest.spyOn(hoveredNearbyItem, "isHovered").mockReturnValue(false);
+      jest
+        .spyOn(dropzone, "isHoveringAvailableSpaceNearItem")
+        .mockImplementation((item) => item === hoveredNearbyItem);
+      jest.spyOn(dndController, "handleHoveredNearItem");
+
+      dndController.handleContextWrapperMouseMove(mouseEvent);
+
+      expect(dndController.handleHoveredNearItem).toHaveBeenCalledWith(
+        draggedItemIndex,
+        dropzone,
+        hoveredNearbyItemIndex
+      );
     });
   });
 });
