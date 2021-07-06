@@ -509,4 +509,27 @@ describe("DndController", () => {
       expect(wrapperElement.onmousemove).toBe(dndController.handleContextWrapperMouseMove);
     });
   });
+
+  describe("prepareDropzonesAndItems()", () => {
+    it("should iterate over dropzones, set absolute position and onmousedown handler to items", () => {
+      const wrapperElement = document.createElement("div");
+      const dropzoneElement = document.createElement("div");
+      const itemElement0 = document.createElement("div");
+      const itemElement1 = document.createElement("div");
+
+      dropzoneElement.id = "bw-dz-a";
+      dropzoneElement.appendChild(itemElement0);
+      dropzoneElement.appendChild(itemElement1);
+      wrapperElement.appendChild(dropzoneElement);
+
+      dndController.setup(wrapperElement);
+
+      const dropzone = dndController.dropzones[0];
+
+      dropzone.items.forEach((item) => {
+        expect(item.itemElement.style.position).toEqual("absolute");
+        expect(item.itemElement.onmousedown).not.toBe(undefined);
+      });
+    });
+  });
 });

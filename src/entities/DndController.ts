@@ -238,19 +238,20 @@ class DndController {
     for (const dropzone of this.dropzones) {
       dropzone.items.forEach((item) => {
         item.itemElement.style.position = "absolute";
-
-        item.itemElement.onmousedown = (e) => {
-          if (this.draggedItem) return;
-
-          item.applyMouseDownStyle(e);
-          this.draggedItem = item;
-          this.initialItemGrabLocation = this.grabbedItemCurrentLocation = {
-            dropzone: item.dropzone,
-            index: item.dropzone.indexOfItem(item),
-          };
-        };
+        item.itemElement.onmousedown = (e) => this.handleItemMouseDown(item, e);
       });
     }
+  };
+
+  handleItemMouseDown = (item: Item, e: MouseEvent) => {
+    if (this.draggedItem) return;
+
+    item.applyMouseDownStyle(e);
+    this.draggedItem = item;
+    this.initialItemGrabLocation = this.grabbedItemCurrentLocation = {
+      dropzone: item.dropzone,
+      index: item.dropzone.indexOfItem(item),
+    };
   };
 
   /**
