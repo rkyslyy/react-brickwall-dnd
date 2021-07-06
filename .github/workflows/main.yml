@@ -16,14 +16,14 @@ jobs:
       - name: Run tests
         run: npm run test
 
-  bump-version:
-    needs: [run-tests]
-    name: "Automated Version Bump"
-    uses: "phips28/gh-action-bump-version@master"
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    with:
-      default: prerelease
+  # bump-version:
+  #   needs: [run-tests]
+  #   name: "Automated Version Bump"
+  #   uses: "phips28/gh-action-bump-version@master"
+  #   env:
+  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #   with:
+  #     default: prerelease
 
   publish:
     needs: [bump-version]
