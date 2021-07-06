@@ -244,8 +244,6 @@ class DndController {
   };
 
   handleItemMouseDown = (item: Item, e: MouseEvent) => {
-    if (this.draggedItem) return;
-
     item.applyMouseDownStyle(e);
     this.draggedItem = item;
     this.initialItemGrabLocation = this.grabbedItemCurrentLocation = {

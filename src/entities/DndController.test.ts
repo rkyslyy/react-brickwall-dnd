@@ -494,6 +494,49 @@ describe("DndController", () => {
     });
   });
 
+  describe("handleHoveredNearItem()", () => {
+    it("should call placeDraggedItemInNewDropzone() if item is dragged item is from different dropzone", () => {
+      const wrapperElement = document.createElement("div");
+      const dropzoneElement0 = document.createElement("div");
+      const dropzoneElement1 = document.createElement("div");
+      const itemElement0 = document.createElement("div");
+      const itemElement1 = document.createElement("div");
+
+      dropzoneElement0.id = "bw-dz-a";
+      dropzoneElement1.id = "bw-dz-b";
+      dropzoneElement0.appendChild(itemElement0);
+      dropzoneElement1.appendChild(itemElement1);
+      wrapperElement.appendChild(dropzoneElement0);
+      wrapperElement.appendChild(dropzoneElement1);
+
+      dndController.setup(wrapperElement);
+
+      const sourceDropzone = dndController.dropzones[0];
+      const destinationDropzone = dndController.dropzones[1];
+
+      const draggedItem = sourceDropzone.items[0];
+      const hoveredNearbyItem = destinationDropzone.items[0];
+
+      const draggedItemIndexInDestinationDropzone = -1;
+
+      dndController.draggedItem = draggedItem;
+
+      jest.spyOn(dndController, "placeDraggedItemInNewDropzone");
+
+      dndController.handleHoveredNearItem(
+        draggedItemIndexInDestinationDropzone,
+        destinationDropzone,
+        destinationDropzone.indexOfItem(hoveredNearbyItem)
+      );
+
+      expect(dndController.placeDraggedItemInNewDropzone).toHaveBeenCalledWith(
+        destinationDropzone,
+        draggedItem,
+        destinationDropzone.indexOfItem(hoveredNearbyItem) + 1
+      );
+    });
+  });
+
   describe("prepareContextWrapper()", () => {
     it("should set contextWrapper, set wrapper mandatory styles and set onmousemove event to wrapper", () => {
       const wrapperElement = document.createElement("div");
@@ -529,6 +572,39 @@ describe("DndController", () => {
       dropzone.items.forEach((item) => {
         expect(item.itemElement.style.position).toEqual("absolute");
         expect(item.itemElement.onmousedown).not.toBe(undefined);
+      });
+    });
+  });
+
+  describe("handleItemMouseDown()", () => {
+    it("should apply mouse down styles to pressed item set dragged item alogn with initial and currenct grab locations", () => {
+      const mouseEvent = new MouseEvent("mousedown");
+      const wrapperElement = document.createElement("div");
+      const dropzoneElement = document.createElement("div");
+      const itemElement0 = document.createElement("div");
+
+      dropzoneElement.id = "bw-dz-a";
+      dropzoneElement.appendChild(itemElement0);
+      wrapperElement.appendChild(dropzoneElement);
+
+      dndController.setup(wrapperElement);
+
+      const dropzone = dndController.dropzones[0];
+      const pressedItem = dropzone.items[0];
+
+      jest.spyOn(pressedItem, "applyMouseDownStyle");
+
+      dndController.handleItemMouseDown(pressedItem, mouseEvent);
+
+      expect(pressedItem.applyMouseDownStyle).toHaveBeenCalled();
+      expect(dndController.draggedItem).toBe(pressedItem);
+      expect(dndController.initialItemGrabLocation).toEqual({
+        dropzone,
+        index: dropzone.indexOfItem(pressedItem),
+      });
+      expect(dndController.grabbedItemCurrentLocation).toEqual({
+        dropzone,
+        index: dropzone.indexOfItem(pressedItem),
       });
     });
   });
