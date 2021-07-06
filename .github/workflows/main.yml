@@ -25,11 +25,11 @@ jobs:
   #   with:
   #     default: prerelease
 
-  publish:
-    needs: [bump-version]
-    name: Publish new version
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Publish
-        run: npm run publish
+  # publish:
+  #   needs: [bump-version]
+  #   name: Publish new version
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Publish
+  #       run: npm run publish
