@@ -444,4 +444,53 @@ describe("DndController", () => {
       });
     });
   });
+
+  describe("getDraggedItemIndexAfterSwitch()", () => {
+    it("should return correct value based on isLeftHovered and isDirectionLeft", () => {
+      const hoveredItemIndex = 2;
+
+      let isLeftHovered: boolean;
+      let isDirectionLeft: boolean;
+
+      isLeftHovered = true;
+      isDirectionLeft = true;
+      expect(
+        dndController.getDraggedItemIndexAfterSwitch(
+          isLeftHovered,
+          isDirectionLeft,
+          hoveredItemIndex
+        )
+      ).toEqual(hoveredItemIndex);
+
+      isLeftHovered = false;
+      isDirectionLeft = false;
+      expect(
+        dndController.getDraggedItemIndexAfterSwitch(
+          isLeftHovered,
+          isDirectionLeft,
+          hoveredItemIndex
+        )
+      ).toEqual(hoveredItemIndex);
+
+      isLeftHovered = true;
+      isDirectionLeft = false;
+      expect(
+        dndController.getDraggedItemIndexAfterSwitch(
+          isLeftHovered,
+          isDirectionLeft,
+          hoveredItemIndex
+        )
+      ).toEqual(hoveredItemIndex - 1);
+
+      isLeftHovered = false;
+      isDirectionLeft = true;
+      expect(
+        dndController.getDraggedItemIndexAfterSwitch(
+          isLeftHovered,
+          isDirectionLeft,
+          hoveredItemIndex
+        )
+      ).toEqual(hoveredItemIndex + 1);
+    });
+  });
 });
