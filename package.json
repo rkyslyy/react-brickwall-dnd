@@ -1,6 +1,6 @@
 {
   "name": "react-brickwall-dnd",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Fancy Drag & Drop component.",
   "typings": "./lib/index.d.ts",
   "module": "./lib/index.js",

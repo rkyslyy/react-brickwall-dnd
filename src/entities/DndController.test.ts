@@ -1,5 +1,3 @@
-import "../setup";
-
 import DndController, { MANDATORY_WRAPPER_STYLE } from "./DndController";
 
 describe("DndController", () => {
