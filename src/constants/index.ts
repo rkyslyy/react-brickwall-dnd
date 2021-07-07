@@ -1,0 +1,2 @@
+export const DEFAULT_ANIMATION_SPEED = 150;
+export const DEFAULT_MIN_HEIGHT = 30;
