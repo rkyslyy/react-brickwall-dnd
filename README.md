@@ -4,7 +4,7 @@
 [![npm version](https://badge.fury.io/js/react-brickwall-dnd.svg)](https://www.npmjs.com/package/react-brickwall-dnd)
 [![made-with-typescript](https://img.shields.io/badge/Made%20with-Typescript-1f425f.svg)](https://www.typescriptlang.org/)
 
-React Brickwall Drag & Drop is a fancy way to move items across multiple data sources via React-driven UI. It doesn't care about width or height of your items and lands them inside dropzones one after another with a given gap between them.
+React Brickwall Drag & Drop is a fancy way to move items across multiple data sources via React-driven UI.
 
 <img src="https://i.imgur.com/Dx0dy0O.gif"/>
 <br/>
