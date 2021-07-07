@@ -44,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rkyslyy/react-brickwall.git"
+    "url": "https://github.com/rkyslyy/react-brickwall-dnd.git"
   },
   "keywords": [
     "dnd",
