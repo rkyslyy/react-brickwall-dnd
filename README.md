@@ -1,7 +1,7 @@
-# React Brickwall &nbsp;<img src="https://raw.githubusercontent.com/rkyslyy/react-brickwall/main/logo.svg" width="50"/>
+# React Brickwall &nbsp;<img src="https://raw.githubusercontent.com/rkyslyy/react-brickwall-dnd/main/logo.svg" width="50"/>
 
 ![example workflow](https://github.com/rkyslyy/react-brickwall/actions/workflows/ci.yml/badge.svg)
-[![npm version](https://badge.fury.io/js/react-brickwall.svg)](https://www.npmjs.com/package/react-brickwall)
+[![npm version](https://badge.fury.io/js/react-brickwall-dnd.svg)](https://www.npmjs.com/package/react-brickwall-dnd)
 [![made-with-typescript](https://img.shields.io/badge/Made%20with-Typescript-1f425f.svg)](https://www.typescriptlang.org/)
 
 React Brickwall Drag & Drop is a fancy way to move items across multiple data sources via React-driven UI. It doesn't care about width or height of your items and lands them inside dropzones one after another with a given gap between them.
