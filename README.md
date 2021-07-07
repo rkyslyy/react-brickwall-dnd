@@ -1,4 +1,4 @@
-# React Brickwall &nbsp;<img src="https://raw.githubusercontent.com/rkyslyy/react-brickwall-dnd/main/logo.svg" width="50"/>
+# React Brickwall Drag & Drop &nbsp;<img src="https://raw.githubusercontent.com/rkyslyy/react-brickwall-dnd/main/logo.svg" width="50"/>
 
 ![example workflow](https://github.com/rkyslyy/react-brickwall/actions/workflows/ci.yml/badge.svg)
 [![npm version](https://badge.fury.io/js/react-brickwall-dnd.svg)](https://www.npmjs.com/package/react-brickwall-dnd)
