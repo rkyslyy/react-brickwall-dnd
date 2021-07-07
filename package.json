@@ -1,7 +1,7 @@
 {
-  "name": "react-brickwall",
-  "version": "1.0.26",
-  "description": "Fancy drag-n-drop component.",
+  "name": "react-brickwall-dnd",
+  "version": "1.0.0",
+  "description": "Fancy Drag & Drop component.",
   "typings": "./lib/index.d.ts",
   "module": "./lib/index.js",
   "scripts": {
@@ -47,10 +47,14 @@
     "url": "https://github.com/rkyslyy/react-brickwall.git"
   },
   "keywords": [
+    "dnd",
     "drag",
-    "drop",
     "drag-n-drop",
+    "drag'n'drop",
+    "drag and drop",
+    "drop",
+    "dropzone",
     "react",
-    "dropzone"
+    "react dnd"
   ]
 }
