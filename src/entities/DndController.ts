@@ -258,7 +258,7 @@ class DndController {
   collectDropzones = (container: HTMLElement) => {
     const dropzones: Dropzone[] = [];
 
-    container.children.array().forEach((child) => {
+    [...(container.children as unknown as HTMLElement[])].forEach((child) => {
       if (hasBrickwallId(child)) {
         dropzones.push(new Dropzone(child));
       } else {
