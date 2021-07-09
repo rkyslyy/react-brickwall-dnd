@@ -32,7 +32,7 @@ Alternatively you can manually store dropzone data sources wherever you like and
 Example:
 
 ```ts
-import Brickwall, { useDataSourceController } from "react-brickwall";
+import Brickwall, { useDataSourceController } from "react-brickwall-dnd";
 
 interface ShufflerComponentProps {
   listA: Item[];
