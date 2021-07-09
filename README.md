@@ -13,7 +13,7 @@ React Brickwall Drag & Drop is a fancy way to move items across multiple data so
 ## Installing
 
 ```
-npm install react-brickwall
+npm install react-brickwall-dnd
 ```
 
 ## Usage
@@ -58,7 +58,6 @@ const ShufflerComponent: React.FC<ShufflerComponentProps> = ({ listA, listB, lis
           <div key={item.id}>{item.text}</div>
         ))}
       </div>
-
       // it doesn't matter how deep you put your dropzones relative to <Brickwall />
       <section>
         <div id="bw-dz-list-b">
