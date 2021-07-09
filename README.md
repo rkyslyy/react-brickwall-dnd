@@ -31,7 +31,7 @@ Alternatively you can manually store dropzone data sources wherever you like and
 
 Example:
 
-```
+```ts
 import Brickwall, { useDataSourceController } from "react-brickwall";
 
 interface ShufflerComponentProps {
