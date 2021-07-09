@@ -1,5 +1,3 @@
-import "./setup";
-
 import { Brickwall } from "./components";
 import { useDataSourceController } from "./hooks";
 
