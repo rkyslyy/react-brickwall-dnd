@@ -113,8 +113,6 @@ export class Dropzone {
     });
 
     // Extend container height
-    //eslint-disable-next-line
-    console.log("RESULTING", resultingContainerHeight);
     this.container.style.height = `${resultingContainerHeight}px`;
   };
 

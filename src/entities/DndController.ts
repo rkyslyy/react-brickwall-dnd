@@ -238,6 +238,7 @@ class DndController {
     for (const dropzone of this.dropzones) {
       dropzone.items.forEach((item) => {
         item.itemElement.style.position = "absolute";
+        item.itemElement.style.maxWidth = `${dropzone.rect.width - this.gridGap * 2}px`;
         item.itemElement.onmousedown = (e) => this.handleItemMouseDown(item, e);
       });
     }
